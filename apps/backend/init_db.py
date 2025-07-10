@@ -30,9 +30,7 @@ def wait_for_database():
             return True
         except psycopg2.OperationalError:
             attempt += 1
-            print(
-                f"Waiting for database... (attempt {attempt}/{max_attempts})"
-            )
+            print(f"Waiting for database... (attempt {attempt}/{max_attempts})")
             time.sleep(2)
 
     print("Failed to connect to database")

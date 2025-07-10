@@ -165,13 +165,19 @@ jobs:
         npm install
         echo "Package-lock.json updated and dependencies installed."
 
+    - name: Format backend code
+      env:
+        PYTHONPATH: ${{ github.workspace }}/apps/backend
+      run: |
+        cd apps/backend
+        black --check . || (echo "Code formatting issues found. Run 'black .' to fix them." && exit 1)
+
     - name: Lint backend code
       env:
         PYTHONPATH: ${{ github.workspace }}/apps/backend
       run: |
         cd apps/backend
-        black --check .
-        flake8 .
+        flake8 . --max-line-length=88 --extend-ignore=E203,W503
 
     - name: Lint frontend code
       run: |
