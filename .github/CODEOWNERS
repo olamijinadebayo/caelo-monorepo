@@ -1,0 +1,19 @@
+# Global code owners
+* @olamijinadebayo
+
+# Backend specific
+apps/backend/ @olamijinadebayo
+
+# Frontend specific  
+apps/frontend/ @olamijinadebayo
+
+# CI/CD and infrastructure
+.github/ @olamijinadebayo
+docker-compose.yml @olamijinadebayo
+dev.sh @olamijinadebayo
+Dockerfile @olamijinadebayo
+
+# Documentation
+README.md @olamijinadebayo
+CONTRIBUTING.md @olamijinadebayo
+BRANCH_PROTECTION.md @olamijinadebayo 
