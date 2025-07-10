@@ -1,7 +1,6 @@
 import time
 import psycopg2
 from sqlalchemy import create_engine
-from sqlalchemy.exc import OperationalError
 import os
 from dotenv import load_dotenv
 

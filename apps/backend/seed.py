@@ -1,4 +1,3 @@
-from sqlalchemy.orm import Session
 from database import SessionLocal, engine
 from models import Base, User, UserRole
 from auth import get_password_hash

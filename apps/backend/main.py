@@ -2,20 +2,16 @@ from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from datetime import datetime, timedelta
-from typing import Optional
-import os
+from datetime import datetime
 from dotenv import load_dotenv
 
 from database import get_db, engine
 from models import Base, User
-from schemas import UserCreate, UserResponse, Token, TokenData
+from schemas import UserResponse, Token
 from auth import (
     authenticate_user,
     create_access_token,
     get_current_user,
-    get_password_hash,
-    ACCESS_TOKEN_EXPIRE_MINUTES,
 )
 
 # Load environment variables
@@ -65,7 +61,6 @@ async def login(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(data={"sub": user.email, "role": user.role})
 
     return {

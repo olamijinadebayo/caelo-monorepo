@@ -2,7 +2,7 @@ import pytest
 import asyncio
 import sys
 import os
-from typing import Generator, AsyncGenerator
+from typing import Generator
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
