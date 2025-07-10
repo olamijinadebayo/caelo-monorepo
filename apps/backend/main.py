@@ -21,7 +21,9 @@ load_dotenv()
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title="Caelo API", description="Community Lending Platform API", version="1.0.0"
+    title="Caelo API",
+    description="Community Lending Platform API",
+    version="1.0.0",
 )
 
 # CORS middleware
@@ -48,7 +50,8 @@ async def root():
 
 @app.post("/auth/login", response_model=Token)
 async def login(
-    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db),
 ):
     """
     Login endpoint that accepts email/password and returns JWT token
@@ -61,7 +64,9 @@ async def login(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    access_token = create_access_token(data={"sub": user.email, "role": user.role})
+    access_token = create_access_token(
+        data={"sub": user.email, "role": user.role}
+    )
 
     return {
         "access_token": access_token,

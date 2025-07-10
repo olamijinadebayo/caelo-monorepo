@@ -7,14 +7,18 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Database URL - defaults to SQLite for development
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./caelo.db")
+DATABASE_URL = os.getenv(
+    "DATABASE_URL", "sqlite:///./caelo.db"
+)
 
 # Create SQLAlchemy engine
 engine = create_engine(
     DATABASE_URL,
-    connect_args={"check_same_thread": False}
-    if DATABASE_URL.startswith("sqlite")
-    else {},
+    connect_args=(
+        {"check_same_thread": False}
+        if DATABASE_URL.startswith("sqlite")
+        else {}
+    ),
 )
 
 # Create SessionLocal class

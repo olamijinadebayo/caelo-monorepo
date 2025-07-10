@@ -35,7 +35,10 @@ class TestAuthLogin:
         """Test successful login."""
         response = client.post(
             "/auth/login",
-            data={"username": test_user.email, "password": "testpassword"},
+            data={
+                "username": test_user.email,
+                "password": "testpassword",
+            },
         )
 
         assert response.status_code == 200
@@ -50,7 +53,10 @@ class TestAuthLogin:
         """Test login with wrong password."""
         response = client.post(
             "/auth/login",
-            data={"username": test_user.email, "password": "wrongpassword"},
+            data={
+                "username": test_user.email,
+                "password": "wrongpassword",
+            },
         )
 
         assert response.status_code == 401
@@ -61,7 +67,10 @@ class TestAuthLogin:
         """Test login with nonexistent user."""
         response = client.post(
             "/auth/login",
-            data={"username": "nonexistent@example.com", "password": "testpassword"},
+            data={
+                "username": "nonexistent@example.com",
+                "password": "testpassword",
+            },
         )
 
         assert response.status_code == 401
@@ -70,13 +79,21 @@ class TestAuthLogin:
 
     def test_login_missing_username(self, client: TestClient):
         """Test login with missing username."""
-        response = client.post("/auth/login", data={"password": "testpassword"})
+        response = client.post(
+            "/auth/login",
+            data={"password": "testpassword"},
+        )
 
         assert response.status_code == 422
 
     def test_login_missing_password(self, client: TestClient):
         """Test login with missing password."""
-        response = client.post("/auth/login", data={"username": "test@example.com"})
+        response = client.post(
+            "/auth/login",
+            data={
+                "username": "test@example.com",
+            },
+        )
 
         assert response.status_code == 422
 
@@ -87,7 +104,8 @@ class TestAuthMe:
     def test_get_me_success(self, client: TestClient, test_user_token: str):
         """Test successful current user retrieval."""
         response = client.get(
-            "/auth/me", headers={"Authorization": f"Bearer {test_user_token}"}
+            "/auth/me",
+            headers={"Authorization": f"Bearer {test_user_token}"},
         )
 
         assert response.status_code == 200
@@ -106,7 +124,8 @@ class TestAuthMe:
     def test_get_me_invalid_token(self, client: TestClient):
         """Test current user retrieval with invalid token."""
         response = client.get(
-            "/auth/me", headers={"Authorization": "Bearer invalid_token"}
+            "/auth/me",
+            headers={"Authorization": "Bearer invalid_token"},
         )
 
         assert response.status_code == 401
@@ -114,7 +133,8 @@ class TestAuthMe:
     def test_get_me_wrong_token_format(self, client: TestClient):
         """Test current user retrieval with wrong token format."""
         response = client.get(
-            "/auth/me", headers={"Authorization": "InvalidFormat token"}
+            "/auth/me",
+            headers={"Authorization": "InvalidFormat token"},
         )
 
         assert response.status_code == 401
@@ -139,12 +159,19 @@ class TestRoleBasedAccess:
         """Test that admin user can access their own data."""
         # Login as admin
         login_response = client.post(
-            "/auth/login", data={"username": admin_user.email, "password": "admin123"}
+            "/auth/login",
+            data={
+                "username": admin_user.email,
+                "password": "admin123",
+            },
         )
         token = login_response.json()["access_token"]
 
         # Access protected endpoint
-        response = client.get("/auth/me", headers={"Authorization": f"Bearer {token}"})
+        response = client.get(
+            "/auth/me",
+            headers={"Authorization": f"Bearer {token}"},
+        )
 
         assert response.status_code == 200
         data = response.json()
@@ -160,13 +187,20 @@ class TestRoleBasedAccess:
         token = login_response.json()["access_token"]
 
         # Access protected endpoint
-        response = client.get("/auth/me", headers={"Authorization": f"Bearer {token}"})
+        response = client.get(
+            "/auth/me",
+            headers={"Authorization": f"Bearer {token}"},
+        )
 
         assert response.status_code == 200
         data = response.json()
         assert data["role"] == "analyst"
 
-    def test_borrower_user_access(self, client: TestClient, borrower_user: User):
+    def test_borrower_user_access(
+        self,
+        client: TestClient,
+        borrower_user: User,
+    ):
         """Test that borrower user can access their own data."""
         # Login as borrower
         login_response = client.post(
@@ -176,7 +210,10 @@ class TestRoleBasedAccess:
         token = login_response.json()["access_token"]
 
         # Access protected endpoint
-        response = client.get("/auth/me", headers={"Authorization": f"Bearer {token}"})
+        response = client.get(
+            "/auth/me",
+            headers={"Authorization": f"Bearer {token}"},
+        )
 
         assert response.status_code == 200
         data = response.json()
@@ -204,7 +241,10 @@ class TestCORS:
         """Test that CORS headers are present in responses."""
         response = client.post(
             "/auth/login",
-            data={"username": test_user.email, "password": "testpassword"},
+            data={
+                "username": test_user.email,
+                "password": "testpassword",
+            },
             headers={"Origin": "http://localhost:8080"},
         )
 

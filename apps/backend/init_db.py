@@ -30,7 +30,9 @@ def wait_for_database():
             return True
         except psycopg2.OperationalError:
             attempt += 1
-            print(f"Waiting for database... (attempt {attempt}/{max_attempts})")
+            print(
+                f"Waiting for database... (attempt {attempt}/{max_attempts})"
+            )
             time.sleep(2)
 
     print("Failed to connect to database")
@@ -45,7 +47,8 @@ def init_database():
     try:
         # Create database engine
         database_url = os.getenv(
-            "DATABASE_URL", "postgresql://caelo_user:caelo_password@postgres:5432/caelo"
+            "DATABASE_URL",
+            "postgresql://caelo_user:caelo_password@postgres:5432/caelo",
         )
         engine = create_engine(database_url)
 

@@ -61,7 +61,9 @@ class TestAuthenticateUser:
 
         # Test authentication
         authenticated_user = authenticate_user(
-            db_session, "test@example.com", "testpassword"
+            db_session,
+            "test@example.com",
+            "testpassword",
         )
 
         assert authenticated_user is not None
@@ -84,7 +86,9 @@ class TestAuthenticateUser:
 
         # Test authentication with wrong password
         authenticated_user = authenticate_user(
-            db_session, "test@example.com", "wrongpassword"
+            db_session,
+            "test@example.com",
+            "wrongpassword",
         )
 
         assert authenticated_user is None
@@ -92,7 +96,9 @@ class TestAuthenticateUser:
     def test_authenticate_user_nonexistent(self, db_session: Session):
         """Test authentication with nonexistent user."""
         authenticated_user = authenticate_user(
-            db_session, "nonexistent@example.com", "testpassword"
+            db_session,
+            "nonexistent@example.com",
+            "testpassword",
         )
 
         assert authenticated_user is None
@@ -125,7 +131,11 @@ class TestGetCurrentUser:
     """Test current user retrieval from JWT token."""
 
     @patch("auth.jwt.decode")
-    def test_get_current_user_success(self, mock_jwt_decode, db_session: Session):
+    def test_get_current_user_success(
+        self,
+        mock_jwt_decode,
+        db_session: Session,
+    ):
         """Test successful current user retrieval."""
         # Mock JWT decode
         mock_jwt_decode.return_value = {"sub": "test@example.com"}

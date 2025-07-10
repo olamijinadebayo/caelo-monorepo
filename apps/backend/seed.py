@@ -55,7 +55,9 @@ def create_demo_users():
         print("Demo users created successfully!")
         print("Demo accounts:")
         for user_data in demo_users:
-            print(f"  - {user_data['email']} (Role: {user_data['role'].value})")
+            print(
+                f"  - {user_data['email']} (Role: {user_data['role'].value})"
+            )
         print("  Password for all accounts: demo123")
 
     except Exception as e:
