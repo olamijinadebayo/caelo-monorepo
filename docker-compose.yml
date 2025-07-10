@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: caelo-postgres
+    environment:
+      POSTGRES_DB: caelo
+      POSTGRES_USER: caelo_user
+      POSTGRES_PASSWORD: caelo_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U caelo_user -d caelo"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # FastAPI Backend
+  backend:
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile
+    container_name: caelo-backend
+    environment:
+      - DATABASE_URL=postgresql://caelo_user:caelo_password@postgres:5432/caelo
+      - JWT_SECRET_KEY=your-super-secret-key-change-in-production
+      - JWT_ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./apps/backend:/app
+      - /app/venv
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: ./start.sh
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # React Frontend (Vite)
+  frontend:
+    build:
+      context: ./apps/frontend
+      dockerfile: Dockerfile
+    container_name: caelo-frontend
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./apps/frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    command: npm run dev -- --host 0.0.0.0 --port 8080
+
+volumes:
+  postgres_data: 
