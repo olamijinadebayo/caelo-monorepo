@@ -37,6 +37,69 @@ The main branch is protected with the following rules:
 7. **Restrict pushes that create files larger than 100MB**
    - Prevents large files from being accidentally committed
 
+## 🚀 Update Branch Button (Merge Main into Feature)
+
+GitHub provides an **"Update branch"** button that allows you to merge main into your feature branch directly from the GitHub interface. This is the easiest way to keep your feature branch up to date.
+
+### How to Use the Update Branch Button
+
+1. **Navigate to your Pull Request**
+   - Go to your pull request on GitHub
+   - Look for a yellow banner that says: *"This branch is out of date with the base branch"*
+
+2. **Click "Update branch"**
+   - You'll see a button that says **"Update branch"**
+   - Click this button to merge the latest changes from main into your feature branch
+
+3. **Choose Merge Strategy**
+   - **Create a merge commit** (recommended for most cases)
+   - **Rebase and update** (if you prefer a linear history)
+
+4. **Confirm the Update**
+   - GitHub will automatically merge main into your feature branch
+   - Your branch will now be up to date with main
+
+### When the Button Appears
+
+The "Update branch" button appears when:
+- Your feature branch is behind the main branch
+- There are new commits on main that aren't in your feature branch
+- The branch protection rule "Require branches to be up to date before merging" is enabled
+
+### Alternative: Manual Update
+
+If you prefer to update manually:
+
+```bash
+# Switch to your feature branch
+git checkout feature/your-feature-name
+
+# Fetch the latest changes
+git fetch origin
+
+# Merge main into your feature branch
+git merge origin/main
+
+# Push the updated branch
+git push origin feature/your-feature-name
+```
+
+Or using rebase (for linear history):
+
+```bash
+# Switch to your feature branch
+git checkout feature/your-feature-name
+
+# Fetch the latest changes
+git fetch origin
+
+# Rebase your branch on main
+git rebase origin/main
+
+# Force push (be careful with this)
+git push --force-with-lease origin feature/your-feature-name
+```
+
 ## How to Set Up Branch Protection
 
 ### 1. Navigate to Repository Settings
