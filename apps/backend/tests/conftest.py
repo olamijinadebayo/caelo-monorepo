@@ -1,15 +1,32 @@
-import pytest
 import asyncio
-from typing import Generator, AsyncGenerator
+import os
+import sys
+from typing import Generator
+
+import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from main import app
-from database import get_db, Base
-from models import User, UserRole
-from auth import get_password_hash
+# Add the parent directory to Python path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# Import these lazily to avoid database connection issues during import
+try:
+    from auth import get_password_hash
+    from database import Base, get_db
+    from models import User, UserRole
+except ImportError:
+    # Fallback for when imports fail during testing setup
+    pass
+
+
+# Lazy import of app to avoid database connection during import
+def get_app():
+    from main import app
+
+    return app
 
 
 # Test database configuration
@@ -46,12 +63,14 @@ def db_session() -> Generator[Session, None, None]:
 @pytest.fixture(scope="function")
 def client(db_session: Session) -> Generator[TestClient, None, None]:
     """Create a test client with a fresh database session."""
+
     def override_get_db():
         try:
             yield db_session
         finally:
             pass
-    
+
+    app = get_app()
     app.dependency_overrides[get_db] = override_get_db
     with TestClient(app) as test_client:
         yield test_client
@@ -67,7 +86,7 @@ def test_user(db_session: Session) -> User:
         role=UserRole.admin,
         name="Test User",
         organization="Test Org",
-        is_active=True
+        is_active=True,
     )
     db_session.add(user)
     db_session.commit()
@@ -80,7 +99,7 @@ def test_user_token(client: TestClient, test_user: User) -> str:
     """Get an access token for the test user."""
     response = client.post(
         "/auth/login",
-        data={"username": test_user.email, "password": "testpassword"}
+        data={"username": test_user.email, "password": "testpassword"},
     )
     return response.json()["access_token"]
 
@@ -94,7 +113,7 @@ def admin_user(db_session: Session) -> User:
         role=UserRole.admin,
         name="Admin User",
         organization="Admin Org",
-        is_active=True
+        is_active=True,
     )
     db_session.add(user)
     db_session.commit()
@@ -111,7 +130,7 @@ def analyst_user(db_session: Session) -> User:
         role=UserRole.analyst,
         name="Analyst User",
         organization="Analyst Org",
-        is_active=True
+        is_active=True,
     )
     db_session.add(user)
     db_session.commit()
@@ -128,9 +147,9 @@ def borrower_user(db_session: Session) -> User:
         role=UserRole.borrower,
         name="Borrower User",
         organization="Borrower Org",
-        is_active=True
+        is_active=True,
     )
     db_session.add(user)
     db_session.commit()
     db_session.refresh(user)
-    return user 
+    return user
