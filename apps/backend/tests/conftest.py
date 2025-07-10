@@ -1,15 +1,25 @@
 import pytest
 import asyncio
+import sys
+import os
 from typing import Generator, AsyncGenerator
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.pool import StaticPool
 
-from main import app
+# Add the parent directory to Python path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# Import these lazily to avoid database connection issues during import
 from database import get_db, Base
 from models import User, UserRole
 from auth import get_password_hash
+
+# Lazy import of app to avoid database connection during import
+def get_app():
+    from main import app
+    return app
 
 
 # Test database configuration
@@ -52,6 +62,7 @@ def client(db_session: Session) -> Generator[TestClient, None, None]:
         finally:
             pass
     
+    app = get_app()
     app.dependency_overrides[get_db] = override_get_db
     with TestClient(app) as test_client:
         yield test_client
