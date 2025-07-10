@@ -15,7 +15,7 @@ from auth import (
     create_access_token,
     get_current_user,
     get_password_hash,
-    ACCESS_TOKEN_EXPIRE_MINUTES
+    ACCESS_TOKEN_EXPIRE_MINUTES,
 )
 
 # Load environment variables
@@ -25,9 +25,7 @@ load_dotenv()
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title="Caelo API",
-    description="Community Lending Platform API",
-    version="1.0.0"
+    title="Caelo API", description="Community Lending Platform API", version="1.0.0"
 )
 
 # CORS middleware
@@ -37,7 +35,7 @@ app.add_middleware(
         "http://localhost:3000",  # Next.js dev server
         "http://localhost:8080",  # Current Vite server
         "https://login.withcaelo.ai",
-        "https://cdfi.withcaelo.ai"
+        "https://cdfi.withcaelo.ai",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -46,14 +44,15 @@ app.add_middleware(
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
+
 @app.get("/")
 async def root():
     return {"message": "Caelo API - Community Lending Platform"}
 
+
 @app.post("/auth/login", response_model=Token)
 async def login(
-    form_data: OAuth2PasswordRequestForm = Depends(),
-    db: Session = Depends(get_db)
+    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
 ):
     """
     Login endpoint that accepts email/password and returns JWT token
@@ -65,12 +64,10 @@ async def login(
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": user.email, "role": user.role}
-    )
-    
+    access_token = create_access_token(data={"sub": user.email, "role": user.role})
+
     return {
         "access_token": access_token,
         "token_type": "bearer",
@@ -79,9 +76,10 @@ async def login(
             "email": user.email,
             "role": user.role,
             "name": user.name,
-            "organization": user.organization
-        }
+            "organization": user.organization,
+        },
     }
+
 
 @app.get("/auth/me", response_model=UserResponse)
 async def get_me(current_user: User = Depends(get_current_user)):
@@ -96,8 +94,9 @@ async def get_me(current_user: User = Depends(get_current_user)):
         "organization": current_user.organization,
         "is_active": current_user.is_active,
         "created_at": current_user.created_at,
-        "updated_at": current_user.updated_at
+        "updated_at": current_user.updated_at,
     }
+
 
 @app.post("/auth/logout")
 async def logout():
@@ -106,7 +105,8 @@ async def logout():
     """
     return {"message": "Successfully logged out"}
 
+
 # Health check endpoint
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "timestamp": datetime.utcnow()} 
+    return {"status": "healthy", "timestamp": datetime.utcnow()}
