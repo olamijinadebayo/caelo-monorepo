@@ -125,6 +125,34 @@ Then create a pull request on GitHub with:
 - Link to any related issues
 - Screenshots for UI changes
 
+### 5. Pull Request Requirements
+
+**Important**: The main branch is protected with strict rules. Your pull request must meet these requirements:
+
+1. **All CI checks must pass**:
+   - Backend tests
+   - Frontend tests
+   - Code quality checks (linting, formatting)
+   - Security scans
+
+2. **Branch must be up to date**: Your branch must be up to date with the latest changes from main before merging
+
+3. **Code review required**: At least one approval from a code owner is required
+
+4. **Conversation resolution**: All review comments must be resolved
+
+5. **Linear history**: Only squash and merge is allowed
+
+**To keep your branch up to date**:
+- If GitHub shows "This branch is out of date with the base branch", click "Update branch"
+- Or manually rebase: `git rebase main && git push --force-with-lease`
+
+**If CI checks fail**:
+- Review the error logs in the Actions tab
+- Fix the issues in your code
+- Push the fixes to your branch
+- The checks will run automatically on the new commits
+
 ## 🧪 Testing Guidelines
 
 ### Backend Testing

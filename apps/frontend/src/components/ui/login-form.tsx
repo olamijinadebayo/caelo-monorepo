@@ -32,11 +32,11 @@ export function LoginForm({ onToggleMode, isSignUp }: LoginFormProps) {
         description: "Welcome to Caelo!",
       });
       
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Login error:', error);
       toast({
         title: "Login Failed",
-        description: error.message || "Invalid credentials",
+        description: (error as Error).message || "Invalid credentials",
         variant: "destructive",
       });
     } finally {
