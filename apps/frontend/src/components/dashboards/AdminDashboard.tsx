@@ -17,6 +17,7 @@ import {
   Clock,
   CheckCircle
 } from "lucide-react";
+import { Logo } from "@/components/ui/logo";
 
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
@@ -42,13 +43,15 @@ const AdminDashboard = () => {
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">C</span>
-              </div>
+              <Logo />
               <div>
                 <h1 className="text-xl font-semibold text-gray-900">Caelo Admin</h1>
                 <p className="text-sm text-gray-600">Community Lending Platform</p>
               </div>
+              {/* Admin-only: Logo upload placeholder */}
+              <Button variant="outline" size="sm" className="ml-4" disabled>
+                Upload Logo (Coming Soon)
+              </Button>
             </div>
             
             <div className="flex items-center space-x-4">

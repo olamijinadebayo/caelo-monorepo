@@ -18,6 +18,7 @@ import {
   AlertTriangle,
   Phone
 } from "lucide-react";
+import { Logo } from "@/components/ui/logo";
 
 const BorrowerDashboard = () => {
   const { user, logout } = useAuth();
@@ -91,9 +92,7 @@ const BorrowerDashboard = () => {
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">C</span>
-              </div>
+              <Logo />
               <div>
                 <h1 className="text-xl font-semibold text-gray-900">My Business Loan</h1>
                 <p className="text-sm text-gray-600">{user?.organization}</p>
