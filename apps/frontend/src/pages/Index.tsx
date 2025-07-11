@@ -7,6 +7,7 @@ import AnalystDashboard from '../components/dashboards/AnalystDashboard';
 import BorrowerDashboard from '../components/dashboards/BorrowerDashboard';
 import { Button } from '../components/ui/button';
 import { Building2, Users, TrendingUp, ArrowRight } from 'lucide-react';
+import { Logo } from '../components/ui/logo';
 
 const Index = () => {
   const { user, logout, checkAuth } = useAuth();
@@ -42,7 +43,7 @@ const Index = () => {
       <header className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Building2 className="h-8 w-8 text-primary" />
+            <Logo />
             <span className="text-2xl font-bold text-foreground">Caelo</span>
           </div>
           <nav className="hidden md:flex items-center space-x-6">
@@ -126,7 +127,7 @@ const Index = () => {
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="flex items-center space-x-2">
-              <Building2 className="h-5 w-5 text-primary" />
+              <Logo className="h-5 w-5" />
               <span className="font-semibold text-foreground">Caelo</span>
             </div>
             <p className="text-sm text-muted-foreground">
