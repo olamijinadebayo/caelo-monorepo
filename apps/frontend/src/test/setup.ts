@@ -58,4 +58,66 @@ const sessionStorageMock = {
   removeItem: vi.fn(),
   clear: vi.fn(),
 };
-global.sessionStorage = sessionStorageMock; 
+global.sessionStorage = sessionStorageMock;
+
+// Mock lib imports for all tests
+vi.mock('../lib/constants', () => ({
+  BUSINESS_TYPES: [
+    { code: '7225', name: 'Restaurant' },
+    { code: '44-45', name: 'Retail' },
+    { code: '23', name: 'Construction' },
+    { code: '31-33', name: 'Manufacturing' },
+    { code: '48-49', name: 'Transportation' },
+    { code: '52', name: 'Finance and Insurance' },
+    { code: '53', name: 'Real Estate' },
+    { code: '54', name: 'Professional Services' },
+    { code: '56', name: 'Administrative Services' },
+    { code: '62', name: 'Healthcare' },
+    { code: '71', name: 'Arts and Entertainment' },
+    { code: '72', name: 'Accommodation and Food Services' }
+  ],
+  USER_ROLES: {
+    ADMIN: 'admin',
+    ANALYST: 'analyst',
+    BORROWER: 'borrower',
+  },
+  APPLICATION_STATUS: {
+    PENDING: 'pending',
+    UNDER_REVIEW: 'under_review',
+    APPROVED: 'approved',
+    REJECTED: 'rejected',
+    FUNDED: 'funded',
+  },
+  APP_CONFIG: {
+    name: 'Caelo',
+    version: '1.0.0',
+    description: 'Modern lending platform',
+  },
+  VALIDATION_RULES: {
+    PASSWORD_MIN_LENGTH: 8,
+    PASSWORD_MAX_LENGTH: 128,
+    EMAIL_MAX_LENGTH: 254,
+    PHONE_MAX_LENGTH: 20,
+    BUSINESS_NAME_MAX_LENGTH: 100,
+    DESCRIPTION_MAX_LENGTH: 500,
+  },
+  PAGINATION: {
+    DEFAULT_PAGE_SIZE: 10,
+    MAX_PAGE_SIZE: 100,
+    PAGE_SIZE_OPTIONS: [10, 25, 50, 100],
+  },
+}));
+
+vi.mock('../lib/types', () => ({
+  LoanProduct: {},
+  RiskSpread: {},
+  User: {},
+  LoanApplication: {},
+  Document: {},
+  LoginFormData: {},
+  SignUpFormData: {},
+  ApiResponse: {},
+  PaginatedResponse: {},
+  BaseComponentProps: {},
+  LoadingState: {},
+})); 

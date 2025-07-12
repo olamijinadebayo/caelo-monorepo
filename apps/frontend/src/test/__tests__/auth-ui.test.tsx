@@ -3,44 +3,6 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import Index from "../../pages/Index";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-// Mock lib imports
-vi.mock('../../../lib/constants', () => ({
-  BUSINESS_TYPES: [
-    { code: '7225', name: 'Restaurant' },
-    { code: '44-45', name: 'Retail' },
-    { code: '23', name: 'Construction' },
-    { code: '31-33', name: 'Manufacturing' },
-    { code: '48-49', name: 'Transportation' },
-    { code: '52', name: 'Finance and Insurance' },
-    { code: '53', name: 'Real Estate' },
-    { code: '54', name: 'Professional Services' },
-    { code: '56', name: 'Administrative Services' },
-    { code: '62', name: 'Healthcare' },
-    { code: '71', name: 'Arts and Entertainment' },
-    { code: '72', name: 'Accommodation and Food Services' }
-  ],
-  USER_ROLES: {
-    ADMIN: 'admin',
-    ANALYST: 'analyst',
-    BORROWER: 'borrower',
-  },
-  APPLICATION_STATUS: {
-    PENDING: 'pending',
-    UNDER_REVIEW: 'under_review',
-    APPROVED: 'approved',
-    REJECTED: 'rejected',
-    FUNDED: 'funded',
-  },
-}));
-
-vi.mock('../../../lib/types', () => ({
-  LoanProduct: {},
-  RiskSpread: {},
-  User: {},
-  LoanApplication: {},
-  Document: {},
-}));
-
 // Mock window.location.hostname for branding tests
 const setHostname = (hostname: string) => {
   Object.defineProperty(window, "location", {
