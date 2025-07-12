@@ -13,6 +13,10 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Separator } from '../ui/separator';
 import { loanProductService, LoanProduct } from '../../services/loanProducts';
+import { loanApplicationService } from '../../services/loanApplications';
+import { LoanApplication } from '../../types/loanApplications';
+import ApplicationQueue from './ApplicationQueue';
+import ApplicationDetail from './ApplicationDetail';
 import { 
   Plus, 
   Edit, 
@@ -30,7 +34,9 @@ import {
   Percent,
   Shield,
   CheckCircle,
-  XCircle
+  XCircle,
+  ClipboardList,
+  TrendingUp
 } from 'lucide-react';
 import { useToast } from '../../hooks/use-toast';
 
@@ -53,16 +59,21 @@ export default function AdminDashboard() {
   const { logout } = useAuth();
   const { toast } = useToast();
   const [loanProducts, setLoanProducts] = useState<LoanProduct[]>([]);
+  const [applications, setApplications] = useState<LoanApplication[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<LoanProduct | null>(null);
+  const [activeTab, setActiveTab] = useState<'applications' | 'products'>('products');
+  const [selectedApplication, setSelectedApplication] = useState<LoanApplication | null>(null);
+  const [highlightedApplicationId, setHighlightedApplicationId] = useState<string | null>(null);
 
-  console.log('AdminDashboard component rendered, isLoading:', isLoading, 'loanProducts count:', loanProducts.length);
+  console.log('AdminDashboard component rendered, isLoading:', isLoading, 'loanProducts count:', loanProducts?.length || 0);
 
   useEffect(() => {
     console.log('AdminDashboard useEffect triggered');
     loadLoanProducts();
+    loadApplications();
   }, []);
 
   const loadLoanProducts = async () => {
@@ -84,7 +95,21 @@ export default function AdminDashboard() {
     }
   };
 
-  const filteredProducts = loanProducts.filter(product =>
+  const loadApplications = async () => {
+    try {
+      const data = await loanApplicationService.getLoanApplications();
+      setApplications(data);
+    } catch (error) {
+      console.error('Error loading applications:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load loan applications.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const filteredProducts = (loanProducts || []).filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     product.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -178,10 +203,28 @@ export default function AdminDashboard() {
           <nav className="mt-8">
             <div className="px-4">
               <div className="space-y-1">
-                <a href="#" className="flex items-center px-3 py-2 text-sm font-medium text-gray-900 bg-gray-100 rounded-md">
+                <button
+                  onClick={() => setActiveTab('applications')}
+                  className={`flex items-center w-full px-3 py-2 text-sm font-medium rounded-md ${
+                    activeTab === 'applications' 
+                      ? 'text-gray-900 bg-gray-100' 
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  }`}
+                >
+                  <ClipboardList className="mr-3 h-5 w-5" />
+                  Loan Applications
+                </button>
+                <button
+                  onClick={() => setActiveTab('products')}
+                  className={`flex items-center w-full px-3 py-2 text-sm font-medium rounded-md ${
+                    activeTab === 'products' 
+                      ? 'text-gray-900 bg-gray-100' 
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  }`}
+                >
                   <FileText className="mr-3 h-5 w-5" />
                   Loan Products
-                </a>
+                </button>
                 <a href="#" className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md">
                   <Users className="mr-3 h-5 w-5" />
                   Borrowers
@@ -202,171 +245,204 @@ export default function AdminDashboard() {
         {/* Main Content */}
         <main className="flex-1 p-8">
           <div className="max-w-7xl mx-auto">
-            {/* Page Header */}
-            <div className="mb-8">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-900">Loan Products</h2>
-                  <p className="text-sm text-gray-500">Create and manage loan products for your lending platform</p>
-                </div>
-                <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button>
-                      <Plus className="mr-2 h-4 w-4" />
-                      Create Loan Product
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                      <DialogTitle>
-                        {editingProduct ? 'Edit Loan Product' : 'Create New Loan Product'}
-                      </DialogTitle>
-                      <DialogDescription>
-                        Configure all parameters for your loan product. This will be used to determine borrower eligibility and loan terms.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <LoanProductForm 
-                      product={editingProduct}
-                      onSave={async (product) => {
-                        try {
-                          if (editingProduct) {
-                            const updatedProduct = await loanProductService.updateLoanProduct({ ...product, id: editingProduct.id });
-                            setLoanProducts(prev => prev.map(p => p.id === editingProduct.id ? updatedProduct : p));
-                          } else {
-                            const newProduct = await loanProductService.createLoanProduct(product);
-                            setLoanProducts(prev => [...prev, newProduct]);
-                          }
-                          setIsCreateDialogOpen(false);
-                          setEditingProduct(null);
-                          toast({
-                            title: editingProduct ? "Product Updated" : "Product Created",
-                            description: `Loan product has been ${editingProduct ? 'updated' : 'created'} successfully.`,
-                          });
-                        } catch (error) {
-                          toast({
-                            title: "Error",
-                            description: `Failed to ${editingProduct ? 'update' : 'create'} product.`,
-                            variant: "destructive",
-                          });
-                        }
-                      }}
-                      onCancel={() => {
-                        setIsCreateDialogOpen(false);
-                        setEditingProduct(null);
-                      }}
-                    />
-                  </DialogContent>
-                </Dialog>
-              </div>
-            </div>
-
-            {/* Search and Filters */}
-            <div className="mb-6">
-              <div className="flex gap-4">
-                <div className="flex-1">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                    <Input
-                      placeholder="Search loan products..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
-                <Button variant="outline">
-                  <Filter className="mr-2 h-4 w-4" />
-                  Filter
-                </Button>
-              </div>
-            </div>
-
-            {/* Loan Products Grid */}
-            {isLoading ? (
-              <div className="text-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-                <p className="mt-2 text-sm text-gray-500">Loading loan products...</p>
+            {activeTab === 'applications' ? (
+              // Applications View
+              <div>
+                {selectedApplication ? (
+                  <ApplicationDetail
+                    application={selectedApplication}
+                    onBack={() => setSelectedApplication(null)}
+                    onApplicationUpdate={(updatedApplication) => {
+                      setApplications(prev => 
+                        prev.map(app => app.id === updatedApplication.id ? updatedApplication : app)
+                      );
+                      setSelectedApplication(updatedApplication);
+                      // Highlight the updated application when returning to queue
+                      setHighlightedApplicationId(updatedApplication.id);
+                      // Clear highlight after 3 seconds
+                      setTimeout(() => {
+                        setHighlightedApplicationId(null);
+                      }, 3000);
+                    }}
+                  />
+                ) : (
+                  <ApplicationQueue
+                    onApplicationSelect={setSelectedApplication}
+                    selectedApplicationId={selectedApplication?.id}
+                    highlightedApplicationId={highlightedApplicationId}
+                  />
+                )}
               </div>
             ) : (
-              <div className="grid gap-6">
-                {filteredProducts.map((product) => (
-                  <Card key={product.id} className="hover:shadow-md transition-shadow">
-                    <CardHeader>
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <CardTitle className="text-lg">{product.name}</CardTitle>
-                            <Badge variant={product.isActive ? "default" : "secondary"}>
-                              {product.isActive ? "Active" : "Inactive"}
-                            </Badge>
-                          </div>
-                          <CardDescription className="text-sm">
-                            {product.description}
-                          </CardDescription>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEdit(product)}
-                            data-testid="edit-button"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDuplicate(product)}
-                            data-testid="duplicate-button"
-                          >
-                            <Copy className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDelete(product.id)}
-                            data-testid="delete-button"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                        <div>
-                          <span className="font-medium text-gray-500">Loan Range:</span>
-                          <p>${product.loanParameters.minAmount.toLocaleString()} - ${product.loanParameters.maxAmount.toLocaleString()}</p>
-                        </div>
-                        <div>
-                          <span className="font-medium text-gray-500">Base Rate:</span>
-                          <p>{product.loanParameters.baseInterestRate}%</p>
-                        </div>
-                        <div>
-                          <span className="font-medium text-gray-500">Terms:</span>
-                          <p>{product.loanParameters.termOptions.join(', ')} months</p>
-                        </div>
-                      </div>
-                      <div className="mt-4 pt-4 border-t">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-500">Created: {product.createdAt}</span>
-                          <Switch
-                            checked={product.isActive}
-                            onCheckedChange={() => handleToggleActive(product.id)}
-                          />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+              // Products View
+              <div>
+                {/* Page Header */}
+                <div className="mb-8">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h2 className="text-xl font-semibold text-gray-900">Loan Products</h2>
+                      <p className="text-sm text-gray-500">Create and manage loan products for your lending platform</p>
+                    </div>
+                    <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Button>
+                          <Plus className="mr-2 h-4 w-4" />
+                          Create Loan Product
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                        <DialogHeader>
+                          <DialogTitle>
+                            {editingProduct ? 'Edit Loan Product' : 'Create New Loan Product'}
+                          </DialogTitle>
+                          <DialogDescription>
+                            Configure all parameters for your loan product. This will be used to determine borrower eligibility and loan terms.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <LoanProductForm 
+                          product={editingProduct}
+                          onSave={async (product) => {
+                            try {
+                              if (editingProduct) {
+                                const updatedProduct = await loanProductService.updateLoanProduct({ ...product, id: editingProduct.id });
+                                setLoanProducts(prev => prev.map(p => p.id === editingProduct.id ? updatedProduct : p));
+                              } else {
+                                const newProduct = await loanProductService.createLoanProduct(product);
+                                setLoanProducts(prev => [...prev, newProduct]);
+                              }
+                              setIsCreateDialogOpen(false);
+                              setEditingProduct(null);
+                              toast({
+                                title: editingProduct ? "Product Updated" : "Product Created",
+                                description: `Loan product has been ${editingProduct ? 'updated' : 'created'} successfully.`,
+                              });
+                            } catch (error) {
+                              toast({
+                                title: "Error",
+                                description: `Failed to ${editingProduct ? 'update' : 'create'} product.`,
+                                variant: "destructive",
+                              });
+                            }
+                          }}
+                          onCancel={() => {
+                            setIsCreateDialogOpen(false);
+                            setEditingProduct(null);
+                          }}
+                        />
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                </div>
 
-                {filteredProducts.length === 0 && (
+                {/* Search and Filters */}
+                <div className="mb-6">
+                  <div className="flex gap-4">
+                    <div className="flex-1">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                        <Input
+                          placeholder="Search loan products..."
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          className="pl-10"
+                        />
+                      </div>
+                    </div>
+                    <Button variant="outline">
+                      <Filter className="mr-2 h-4 w-4" />
+                      Filter
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Loan Products Grid */}
+                {isLoading ? (
                   <div className="text-center py-12">
-                    <FileText className="mx-auto h-12 w-12 text-gray-400" />
-                    <h3 className="mt-2 text-sm font-medium text-gray-900">No loan products</h3>
-                    <p className="mt-1 text-sm text-gray-500">
-                      Get started by creating your first loan product.
-                    </p>
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+                    <p className="mt-2 text-sm text-gray-500">Loading loan products...</p>
+                  </div>
+                ) : (
+                  <div className="grid gap-6">
+                    {filteredProducts.map((product) => (
+                      <Card key={product.id} className="hover:shadow-md transition-shadow">
+                        <CardHeader>
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-2">
+                                <CardTitle className="text-lg">{product.name}</CardTitle>
+                                <Badge variant={product.isActive ? "default" : "secondary"}>
+                                  {product.isActive ? "Active" : "Inactive"}
+                                </Badge>
+                              </div>
+                              <CardDescription className="text-sm">
+                                {product.description}
+                              </CardDescription>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleEdit(product)}
+                                data-testid="edit-button"
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDuplicate(product)}
+                                data-testid="duplicate-button"
+                              >
+                                <Copy className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDelete(product.id)}
+                                data-testid="delete-button"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                            <div>
+                              <span className="font-medium text-gray-500">Loan Range:</span>
+                              <p>${product.loanParameters.minAmount.toLocaleString()} - ${product.loanParameters.maxAmount.toLocaleString()}</p>
+                            </div>
+                            <div>
+                              <span className="font-medium text-gray-500">Base Rate:</span>
+                              <p>{product.loanParameters.baseInterestRate}%</p>
+                            </div>
+                            <div>
+                              <span className="font-medium text-gray-500">Terms:</span>
+                              <p>{product.loanParameters.termOptions.join(', ')} months</p>
+                            </div>
+                          </div>
+                          <div className="mt-4 pt-4 border-t">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm text-gray-500">Created: {product.createdAt}</span>
+                              <Switch
+                                checked={product.isActive}
+                                onCheckedChange={() => handleToggleActive(product.id)}
+                              />
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+
+                    {filteredProducts.length === 0 && (
+                      <div className="text-center py-12">
+                        <FileText className="mx-auto h-12 w-12 text-gray-400" />
+                        <h3 className="mt-2 text-sm font-medium text-gray-900">No loan products</h3>
+                        <p className="mt-1 text-sm text-gray-500">
+                          Get started by creating your first loan product.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
