@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { Badge } from '../../ui/badge';
 import { Button } from '../../ui/button';
 import { Switch } from '../../ui/switch';
-import { LoanProduct } from '@/lib/types';
+import { LoanProduct } from '../../../lib/types';
 import { 
   Edit, 
   Copy, 

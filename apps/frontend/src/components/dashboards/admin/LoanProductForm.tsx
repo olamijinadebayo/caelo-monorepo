@@ -5,8 +5,8 @@ import { Label } from '../../ui/label';
 import { Textarea } from '../../ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../../ui/dialog';
-import { LoanProduct, RiskSpread } from '@/lib/types';
-import { BUSINESS_TYPES } from '@/lib/constants';
+import { LoanProduct, RiskSpread } from '../../../lib/types';
+import { BUSINESS_TYPES } from '../../../lib/constants';
 import { Plus, X } from 'lucide-react';
 
 interface LoanProductFormProps {
