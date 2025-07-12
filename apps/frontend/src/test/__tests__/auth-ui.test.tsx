@@ -60,7 +60,7 @@ describe("Authentication UI", () => {
     expect(cdfiElements.length).toBeGreaterThan(0);
   });
 
-  it("shows placeholder dashboard after demo login", async () => {
+  it("shows admin dashboard after demo login", async () => {
     render(<Index />);
     // Select demo user
     fireEvent.change(screen.getByLabelText(/Switch User/i), {
@@ -72,6 +72,8 @@ describe("Authentication UI", () => {
     fireEvent.click(submitButton!);
     // Wait for dashboard
     expect(await screen.findByText(/Admin Dashboard/i)).toBeInTheDocument();
-    expect(screen.getByText(/placeholder for Sprint 1/i)).toBeInTheDocument();
+    // Check for loan products content instead of placeholder
+    expect(screen.getAllByText(/Loan Products/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/Create Loan Product/i)).toBeInTheDocument();
   });
 }); 
