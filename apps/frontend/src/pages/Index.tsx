@@ -27,32 +27,11 @@ const Index = () => {
   if (user) {
     switch (user.role) {
       case 'admin':
-        return (
-          <div className="min-h-screen flex flex-col items-center justify-center">
-            <Logo />
-            <h1 className="text-3xl font-bold mb-4">Admin Dashboard</h1>
-            <p className="text-muted-foreground">This dashboard is a placeholder for Sprint 1.</p>
-            <Button className="mt-8" onClick={logout}>Logout</Button>
-          </div>
-        );
+        return <AdminDashboard />;
       case 'analyst':
-        return (
-          <div className="min-h-screen flex flex-col items-center justify-center">
-            <Logo />
-            <h1 className="text-3xl font-bold mb-4">Analyst Dashboard</h1>
-            <p className="text-muted-foreground">This dashboard is a placeholder for Sprint 1.</p>
-            <Button className="mt-8" onClick={logout}>Logout</Button>
-          </div>
-        );
+        return <AnalystDashboard />;
       case 'borrower':
-        return (
-          <div className="min-h-screen flex flex-col items-center justify-center">
-            <Logo />
-            <h1 className="text-3xl font-bold mb-4">Borrower Dashboard</h1>
-            <p className="text-muted-foreground">This dashboard is a placeholder for Sprint 1.</p>
-            <Button className="mt-8" onClick={logout}>Logout</Button>
-          </div>
-        );
+        return <BorrowerDashboard />;
       default:
         return <div>Invalid user role</div>;
     }
