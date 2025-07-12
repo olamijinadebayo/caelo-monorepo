@@ -61,7 +61,7 @@ const sessionStorageMock = {
 global.sessionStorage = sessionStorageMock;
 
 // Mock lib imports for all tests
-vi.mock('../lib/constants', () => ({
+vi.mock('../../../lib/constants', () => ({
   BUSINESS_TYPES: [
     { code: '7225', name: 'Restaurant' },
     { code: '44-45', name: 'Retail' },
@@ -108,7 +108,7 @@ vi.mock('../lib/constants', () => ({
   },
 }));
 
-vi.mock('../lib/types', () => ({
+vi.mock('../../../lib/types', () => ({
   LoanProduct: {},
   RiskSpread: {},
   User: {},
