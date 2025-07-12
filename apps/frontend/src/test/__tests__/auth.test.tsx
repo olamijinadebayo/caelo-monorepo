@@ -188,18 +188,23 @@ describe('useAuth', () => {
     it('should handle demo token authentication', async () => {
       localStorage.setItem('access_token', 'demo_token_1_1234567890')
 
+      // Mock AuthService.getMe to throw API_UNAVAILABLE so demo token logic is triggered
+      vi.mocked(AuthService.getMe).mockRejectedValue(new Error('API_UNAVAILABLE'))
+
       const { result } = renderHook(() => useAuth())
 
-      // Set a demo user in the store
+      // Set a demo user in the store using the proper setState method
       act(() => {
-        result.current.user = {
-          id: '1',
-          email: 'sarah@withcaelo.ai',
-          role: 'admin',
-          name: 'Sarah Chen',
-          organization: 'Caelo Inc.',
-        }
-        result.current.token = 'demo_token_1_1234567890'
+        useAuth.setState({
+          user: {
+            id: '1',
+            email: 'sarah@withcaelo.ai',
+            role: 'admin',
+            name: 'Sarah Chen',
+            organization: 'Caelo Inc.',
+          },
+          token: 'demo_token_1_1234567890'
+        })
       })
 
       await act(async () => {
