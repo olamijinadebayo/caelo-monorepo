@@ -437,10 +437,10 @@ describe('AdminDashboard', () => {
     it('highlights current section', () => {
       render(<AdminDashboard />);
       
-      // Find the sidebar navigation link specifically
-      const sidebarLinks = screen.getAllByText('Loan Products');
-      const sidebarLink = sidebarLinks.find(element => element.closest('a'));
-      expect(sidebarLink?.closest('a')).toHaveClass('bg-gray-100');
+      // Find the sidebar navigation button specifically (Loan Products should be highlighted by default)
+      const sidebarButtons = screen.getAllByText('Loan Products');
+      const sidebarButton = sidebarButtons.find(element => element.closest('button'));
+      expect(sidebarButton?.closest('button')).toHaveClass('bg-gray-100');
     });
   });
 }); 
