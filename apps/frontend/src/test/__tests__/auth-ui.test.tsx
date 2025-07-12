@@ -72,8 +72,10 @@ describe("Authentication UI", () => {
     fireEvent.click(submitButton!);
     // Wait for dashboard
     expect(await screen.findByText(/Admin Dashboard/i)).toBeInTheDocument();
+    // Wait for loading to complete and check for the tab button specifically
+    await screen.findByRole("tab", { name: /Loan Products/i });
     // Check for loan products content instead of placeholder
-    expect(screen.getAllByText(/Loan Products/i).length).toBeGreaterThan(0);
+    expect(screen.getByRole("tab", { name: /Loan Products/i })).toBeInTheDocument();
     expect(screen.getByText(/Create Loan Product/i)).toBeInTheDocument();
   });
 }); 

@@ -100,7 +100,7 @@ export default function ApplicationQueue({ onApplicationSelect, selectedApplicat
 
     // Sort applications
     filtered.sort((a, b) => {
-      let aValue: any, bValue: any;
+      let aValue: number, bValue: number;
       
       switch (sortBy) {
         case 'date':

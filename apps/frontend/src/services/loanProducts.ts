@@ -1,49 +1,37 @@
 import { AuthService } from './auth';
+import { LoanProduct as LoanProductType } from '../lib/types';
 
 export interface LoanProduct {
   id: string;
   name: string;
   description: string;
+  minAmount: number;
+  maxAmount: number;
+  interestRate: number;
+  termLength: number;
   isActive: boolean;
+  businessTypes: string[];
+  riskSpreads: Array<{
+    lendscoreRange: string;
+    spread: number;
+  }>;
   createdAt: string;
-  eligibilityRequirements: {
-    timeInBusiness?: number;
-    minCreditScore?: number;
-    maxCreditScore?: number;
-    businessTypes?: string[];
-  };
-  loanParameters: {
-    minAmount: number;
-    maxAmount: number;
-    termOptions: number[];
-    baseInterestRate: number;
-    riskSpread: Array<{
-      lendscoreRange: string;
-      spread: number;
-    }>;
-  };
+  updatedAt: string;
 }
 
 export interface CreateLoanProductRequest {
   name: string;
   description: string;
+  minAmount: number;
+  maxAmount: number;
+  interestRate: number;
+  termLength: number;
   isActive: boolean;
-  eligibilityRequirements: {
-    timeInBusiness?: number;
-    minCreditScore?: number;
-    maxCreditScore?: number;
-    businessTypes?: string[];
-  };
-  loanParameters: {
-    minAmount: number;
-    maxAmount: number;
-    termOptions: number[];
-    baseInterestRate: number;
-    riskSpread: Array<{
-      lendscoreRange: string;
-      spread: number;
-    }>;
-  };
+  businessTypes: string[];
+  riskSpreads: Array<{
+    lendscoreRange: string;
+    spread: number;
+  }>;
 }
 
 export interface UpdateLoanProductRequest extends CreateLoanProductRequest {
@@ -105,6 +93,7 @@ class LoanProductService {
         ...product,
         id: Date.now().toString(),
         createdAt: new Date().toISOString().split('T')[0],
+        updatedAt: new Date().toISOString().split('T')[0],
       };
       this.saveLocalLoanProduct(localProduct);
       return localProduct;
@@ -131,6 +120,7 @@ class LoanProductService {
       const localProduct: LoanProduct = {
         ...product,
         createdAt: this.getLocalLoanProduct(product.id)?.createdAt || new Date().toISOString().split('T')[0],
+        updatedAt: new Date().toISOString().split('T')[0],
       };
       this.updateLocalLoanProduct(localProduct);
       return localProduct;
@@ -257,49 +247,40 @@ class LoanProductService {
         id: '1',
         name: 'River City Launchpad',
         description: 'Use for Working capital, Equipment Purchases or Vehicle Purchases',
+        minAmount: 100,
+        maxAmount: 250000,
+        interestRate: 8.5,
+        termLength: 36,
         isActive: true,
+        businessTypes: ['Restaurant - 7225', 'Retail - 44-45'],
+        riskSpreads: [
+          { lendscoreRange: '90+', spread: 0 },
+          { lendscoreRange: '80-89', spread: 1 },
+          { lendscoreRange: '70-79', spread: 2 },
+          { lendscoreRange: '60-69', spread: 3 },
+          { lendscoreRange: '<50', spread: 4 }
+        ],
         createdAt: '2024-01-15',
-        eligibilityRequirements: {
-          timeInBusiness: 12,
-          minCreditScore: 650,
-          businessTypes: ['Restaurant - 7225', 'Retail - 44-45']
-        },
-        loanParameters: {
-          minAmount: 100,
-          maxAmount: 250000,
-          termOptions: [3, 6, 12, 24, 36, 48, 60],
-          baseInterestRate: 8.5,
-          riskSpread: [
-            { lendscoreRange: '90+', spread: 0 },
-            { lendscoreRange: '80-89', spread: 1 },
-            { lendscoreRange: '70-79', spread: 2 },
-            { lendscoreRange: '60-69', spread: 3 },
-            { lendscoreRange: '<50', spread: 4 }
-          ]
-        }
+        updatedAt: '2024-01-15'
       },
       {
         id: '2',
         name: 'Small Business Growth Fund',
         description: 'Flexible financing for established businesses looking to expand',
+        minAmount: 5000,
+        maxAmount: 100000,
+        interestRate: 7.2,
+        termLength: 48,
         isActive: false,
+        businessTypes: [],
+        riskSpreads: [
+          { lendscoreRange: '90+', spread: 0 },
+          { lendscoreRange: '80-89', spread: 0.5 },
+          { lendscoreRange: '70-79', spread: 1.5 },
+          { lendscoreRange: '60-69', spread: 2.5 }
+        ],
         createdAt: '2024-01-10',
-        eligibilityRequirements: {
-          timeInBusiness: 24,
-          minCreditScore: 700
-        },
-        loanParameters: {
-          minAmount: 5000,
-          maxAmount: 100000,
-          termOptions: [12, 24, 36, 48],
-          baseInterestRate: 7.2,
-          riskSpread: [
-            { lendscoreRange: '90+', spread: 0 },
-            { lendscoreRange: '80-89', spread: 0.5 },
-            { lendscoreRange: '70-79', spread: 1.5 },
-            { lendscoreRange: '60-69', spread: 2.5 }
-          ]
-        }
+        updatedAt: '2024-01-10'
       }
     ];
   }

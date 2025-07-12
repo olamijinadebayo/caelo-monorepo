@@ -39,7 +39,7 @@ const Index = () => {
 
   // Landing page for unauthenticated users
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex flex-col">
       {/* Header */}
       <header className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between">
@@ -60,9 +60,11 @@ const Index = () => {
           </nav>
         </div>
       </header>
-      <main className="container mx-auto px-4 py-12 flex flex-col lg:flex-row items-center justify-between">
+      
+      {/* Main Content - Flex grow to fill available space */}
+      <main className="flex-1 container mx-auto px-4 py-8 flex flex-col lg:flex-row items-center justify-between">
         {/* Left Column - Info */}
-        <div className="w-full lg:w-1/2 mb-12 lg:mb-0">
+        <div className="w-full lg:w-1/2 mb-8 lg:mb-0">
           <h1 className="text-4xl font-bold mb-4 text-foreground">
             Welcome to {branding.name}
           </h1>
@@ -81,9 +83,10 @@ const Index = () => {
           )}
         </div>
       </main>
-      {/* Footer */}
-      <footer className="mt-20 border-t bg-background/50">
-        <div className="container mx-auto px-4 py-8">
+      
+      {/* Footer - Reduced margin */}
+      <footer className="border-t bg-background/50 mt-auto">
+        <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="flex items-center space-x-2">
               {/* Replace logo image with text */}

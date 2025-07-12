@@ -166,3 +166,9 @@ temp/
 # Backup files
 *.bak
 *.backup 
+
+# Cursor config files
+.cursorrules
+.cursorignore
+.cursorprompts
+.cursor* 
