@@ -1,9 +1,13 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, Request, Response
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from datetime import datetime
 from dotenv import load_dotenv
+
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 from database import get_db, engine
 from models import Base, User
@@ -20,11 +24,16 @@ load_dotenv()
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
+limiter = Limiter(key_func=get_remote_address, headers_enabled=True)
+
 app = FastAPI(
     title="Caelo API",
     description="Community Lending Platform API",
     version="1.0.0",
 )
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # CORS middleware
 app.add_middleware(
@@ -49,7 +58,10 @@ async def root():
 
 
 @app.post("/auth/login", response_model=Token)
+@limiter.limit("10/minute")
 async def login(
+    request: Request,
+    response: Response,
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
 ):
