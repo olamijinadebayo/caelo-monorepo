@@ -1,4 +1,5 @@
 from fastapi.testclient import TestClient
+import time
 
 from models import User
 
@@ -62,7 +63,27 @@ class TestAuthLogin:
         assert response.status_code == 401
         data = response.json()
         assert "Incorrect email or password" in data["detail"]
+        
+    def test_login_rate_limit(self, client: TestClient, test_user: User):
+        """Test rate limits on excessive login attempts"""
+        # Range is 8 as previous tests to the same endpoint have been executed
+        for _ in range(8):
+           # Test unsuccessful login.
+            self.test_login_wrong_password(client=client, test_user=test_user)
+            
+       # Test with valid credentials    
+        response = client.post(
+            "/auth/login",
+            data={
+                "username": test_user.email,
+                "password": "testpassword",
+            },
+        )
 
+        assert response.status_code == 429
+        # Sleep to allow other tests reach the same endpoint without limits
+        time.sleep(61)
+            
     def test_login_nonexistent_user(self, client: TestClient):
         """Test login with nonexistent user."""
         response = client.post(
