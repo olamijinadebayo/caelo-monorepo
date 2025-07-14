@@ -9,31 +9,29 @@ import { AuthService, LoginRequest } from '../../services/auth';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/use-toast';
 
-interface LoginFormProps {
-  onToggleMode: () => void;
-  isSignUp: boolean;
-}
+const DEMO_USERS = [
+  { label: "Admin (Sarah)", email: "sarah@withcaelo.ai" },
+  { label: "Analyst (Mike)", email: "mike@cdfi.example.org" },
+  { label: "Borrower (Jessica)", email: "jessica@smallbiz.com" },
+];
 
-export function LoginForm({ onToggleMode, isSignUp }: LoginFormProps) {
+export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const { toast } = useToast();
-  
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginRequest>();
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm<LoginRequest>();
+
+  const [selectedDemo, setSelectedDemo] = useState<string>("");
 
   const onSubmit = async (data: LoginRequest) => {
     setIsLoading(true);
     try {
-      // Use the login function from useAuth hook which handles demo fallback
       await login(data.email, data.password);
-      
       toast({
         title: "Login Successful",
         description: "Welcome to Caelo!",
       });
-      
     } catch (error: unknown) {
-      console.error('Login error:', error);
       toast({
         title: "Login Failed",
         description: (error as Error).message || "Invalid credentials",
@@ -44,34 +42,14 @@ export function LoginForm({ onToggleMode, isSignUp }: LoginFormProps) {
     }
   };
 
-  if (isSignUp) {
-    return (
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
-          <CardDescription>
-            Sign up for Caelo to get started
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="text-center text-muted-foreground">
-            <p>Borrower registration coming soon!</p>
-            <p className="text-sm mt-2">
-              Please contact your lending organization for access.
-            </p>
-          </div>
-          <Button 
-            type="button" 
-            variant="outline" 
-            className="w-full"
-            onClick={onToggleMode}
-          >
-            Back to Sign In
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
+  const handleDemoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const email = e.target.value;
+    setSelectedDemo(email);
+    if (email) {
+      setValue("email", email);
+      setValue("password", "demo123");
+    }
+  };
 
   return (
     <Card className="w-full max-w-md">
@@ -101,7 +79,6 @@ export function LoginForm({ onToggleMode, isSignUp }: LoginFormProps) {
               <p className="text-sm text-destructive">{errors.email.message}</p>
             )}
           </div>
-          
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
             <Input
@@ -120,7 +97,22 @@ export function LoginForm({ onToggleMode, isSignUp }: LoginFormProps) {
               <p className="text-sm text-destructive">{errors.password.message}</p>
             )}
           </div>
-
+          <div className="space-y-2">
+            <Label htmlFor="demo-user">Switch User (Demo)</Label>
+            <select
+              id="demo-user"
+              className="w-full border rounded px-2 py-1"
+              value={selectedDemo}
+              onChange={handleDemoChange}
+            >
+              <option value="">Select a demo user</option>
+              {DEMO_USERS.map((user) => (
+                <option key={user.email} value={user.email}>
+                  {user.label}
+                </option>
+              ))}
+            </select>
+          </div>
           <Button 
             type="submit" 
             className="w-full" 
@@ -128,26 +120,7 @@ export function LoginForm({ onToggleMode, isSignUp }: LoginFormProps) {
           >
             {isLoading ? 'Signing in...' : 'Sign In'}
           </Button>
-
-          <div className="text-center">
-            <Button 
-              type="button" 
-              variant="link" 
-              onClick={onToggleMode}
-              className="p-0"
-            >
-              Need an account? Sign up
-            </Button>
-          </div>
         </form>
-
-        <div className="mt-6 pt-4 border-t">
-          <p className="text-xs text-muted-foreground text-center">
-            Demo accounts: sarah@withcaelo.ai, mike@cdfi.example.org, jessica@smallbiz.com
-            <br />
-            Password: demo123
-          </p>
-        </div>
       </CardContent>
     </Card>
   );
