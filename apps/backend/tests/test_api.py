@@ -63,15 +63,15 @@ class TestAuthLogin:
         assert response.status_code == 401
         data = response.json()
         assert "Incorrect email or password" in data["detail"]
-        
+
     def test_login_rate_limit(self, client: TestClient, test_user: User):
         """Test rate limits on excessive login attempts"""
         # Range is 8 as previous tests to the same endpoint have been executed
         for _ in range(8):
-           # Test unsuccessful login.
+            # Test unsuccessful login.
             self.test_login_wrong_password(client=client, test_user=test_user)
-            
-       # Test with valid credentials    
+
+        # Test with valid credentials
         response = client.post(
             "/auth/login",
             data={
