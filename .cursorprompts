@@ -1,0 +1,110 @@
+# Cursor Prompts for Caelo Monorepo
+
+## Code Review Prompt
+```
+Please review this code following our best practices:
+- Check TypeScript usage and type safety
+- Verify React component structure and hooks usage
+- Ensure proper error handling
+- Check for accessibility compliance
+- Verify performance considerations
+- Ensure proper file organization
+- Check for security best practices
+
+[PASTE CODE HERE]
+```
+
+## Component Creation Prompt
+```
+Create a React component following our best practices:
+- Use TypeScript with proper interfaces
+- Use functional components with hooks
+- Include proper error handling
+- Add accessibility features
+- Use Tailwind CSS for styling
+- Include JSDoc comments
+- Make it reusable and composable
+
+Requirements: [DESCRIBE REQUIREMENTS]
+```
+
+## Refactor Prompt
+```
+Refactor this code following our best practices:
+- Improve TypeScript usage
+- Optimize React component structure
+- Add proper error handling
+- Improve performance
+- Enhance accessibility
+- Clean up code organization
+- Add proper documentation
+
+[PASTE CODE HERE]
+```
+
+## Bug Fix Prompt
+```
+Fix this bug following our best practices:
+- Ensure type safety
+- Add proper error handling
+- Maintain React best practices
+- Consider performance impact
+- Verify accessibility
+- Add tests if needed
+
+Bug description: [DESCRIBE BUG]
+[PASTE CODE HERE]
+```
+
+## Feature Addition Prompt
+```
+Add this feature following our best practices:
+- Use TypeScript with proper typing
+- Follow React component patterns
+- Include error handling
+- Ensure accessibility
+- Consider performance
+- Add proper documentation
+- Include tests
+
+Feature requirements: [DESCRIBE FEATURE]
+```
+
+## Testing Prompt
+```
+Write tests for this code following our best practices:
+- Use React Testing Library
+- Test user interactions
+- Mock external dependencies
+- Test error scenarios
+- Use descriptive test names
+- Ensure good coverage
+
+[PASTE CODE HERE]
+```
+
+## Performance Optimization Prompt
+```
+Optimize this code for performance following our best practices:
+- Use React.memo() where appropriate
+- Implement useCallback and useMemo
+- Optimize re-renders
+- Consider code splitting
+- Optimize bundle size
+- Profile and measure improvements
+
+[PASTE CODE HERE]
+```
+
+## Accessibility Improvement Prompt
+```
+Improve accessibility following our best practices:
+- Add semantic HTML
+- Include ARIA labels
+- Ensure keyboard navigation
+- Add alt text for images
+- Use proper heading hierarchy
+- Test with screen readers
+
+[PASTE CODE HERE]
+``` 
