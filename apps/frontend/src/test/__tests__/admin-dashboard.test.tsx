@@ -87,8 +87,8 @@ vi.mock('../../services/loanProducts', () => ({
 vi.mock('../../hooks/useAuth');
 vi.mock('../../hooks/use-toast');
 
-const mockUseAuth = useAuth as any;
-const mockUseToast = useToast as any;
+const mockUseAuth = useAuth as vi.Mock;
+const mockUseToast = useToast as vi.Mock;
 
 describe('AdminDashboard', () => {
   const mockLogout = vi.fn();

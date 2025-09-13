@@ -23,7 +23,7 @@ interface EnhancedApplicationDetailProps {
 // Mock data matching the Figma design
 const getMockApplicationData = (id: ApplicationId): LoanApplication => ({
   id,
-  borrowerId: 'IDC1092EA23' as any,
+  borrowerId: id,
   borrowerName: 'Jessica Smith',
   businessName: 'Sunrise Bakery',
   businessType: 'Food Services',

@@ -37,15 +37,17 @@ const PreviewModal: React.FC<PreviewModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/10 backdrop-blur-[5px] flex items-center justify-center z-50 p-7">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-[720px] max-h-[882px] overflow-auto">
-        <div className="p-6 space-y-5">
-          {/* Header */}
-          <div>
-            <h1 className="text-2xl font-medium text-black leading-9">
-              Preview
-            </h1>
-          </div>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-[720px] max-h-[90vh] flex flex-col">
+        {/* Fixed Header */}
+        <div className="p-6 border-b border-gray-200 flex-shrink-0">
+          <h1 className="text-2xl font-medium text-black leading-9">
+            Preview
+          </h1>
+        </div>
+        
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
 
           {/* Step 1 Data - Loan Builder */}
           <div className="space-y-6">
@@ -193,20 +195,22 @@ const PreviewModal: React.FC<PreviewModalProps> = ({
             </div>
           </div>
         </div>
-
-        {/* Save Button */}
-        <div className="p-6 pt-0 flex justify-end">
-          <Button 
-            onClick={handleSave}
-            disabled={isLoading}
-            className="bg-[#1a2340] text-[#fff5e6] hover:bg-[#111629] 
-                     border border-[#fff5e6] rounded-lg px-3.5 py-2 
-                     text-sm font-medium leading-5
-                     shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)]
-                     disabled:opacity-50"
-          >
-            {isLoading ? 'Saving...' : 'Save Details'}
-          </Button>
+        
+        {/* Fixed Footer with Save Button */}
+        <div className="border-t border-gray-200 p-6 flex-shrink-0 bg-white rounded-b-2xl">
+          <div className="flex justify-end">
+            <Button 
+              onClick={handleSave}
+              disabled={isLoading}
+              className="bg-[#1a2340] text-[#fff5e6] hover:bg-[#111629] 
+                       border border-[#fff5e6] rounded-lg px-6 py-3 
+                       text-sm font-medium leading-5
+                       shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)]
+                       disabled:opacity-50 min-w-[120px]"
+            >
+              {isLoading ? 'Saving...' : 'Save Details'}
+            </Button>
+          </div>
         </div>
       </div>
     </div>

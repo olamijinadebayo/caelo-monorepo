@@ -12,6 +12,9 @@ import { useAuth } from '../../hooks/useAuth';
 import { Logo } from '../ui/logo';
 import type { ApplicationId } from '../../types/loanApplications';
 import EnhancedApplicationDetail from './EnhancedApplicationDetail';
+import { EnhancedLenderDashboard } from './EnhancedLenderDashboard';
+import { EnhancedLoanApplicationDetail } from './EnhancedLoanApplicationDetail';
+import { FigmaApplicationDetail } from './FigmaApplicationDetail';
 import LoanBuilderFlow from '../loan-builder/LoanBuilderFlow';
 import SettingsPage from '../pages/SettingsPage';
 import LoanProductsPage from '../pages/LoanProductsPage';
@@ -33,7 +36,7 @@ interface LoanProduct {
 
 const LenderDashboard = () => {
   const { user, logout } = useAuth();
-  const [activeView, setActiveView] = useState<'dashboard' | 'loan-approvals' | 'users' | 'settings' | 'loan-products' | 'loan-builder'>('settings');
+  const [activeView, setActiveView] = useState<'dashboard' | 'enhanced-dashboard' | 'loan-approvals' | 'users' | 'settings' | 'loan-products' | 'loan-builder'>('enhanced-dashboard');
   const [selectedApplicationId, setSelectedApplicationId] = useState<ApplicationId | null>(null);
   const [loanProducts, setLoanProducts] = useState<LoanProduct[]>([]);
 
@@ -97,10 +100,23 @@ const LenderDashboard = () => {
 
   // If viewing application detail, show that
   if (selectedApplicationId) {
+         return (
+           <FigmaApplicationDetail 
+             applicationId={selectedApplicationId}
+             onBack={() => setSelectedApplicationId(null)}
+             onNavigateToDashboard={() => {
+               setSelectedApplicationId(null);
+               setActiveView('enhanced-dashboard');
+             }}
+           />
+         );
+  }
+
+  // Enhanced Dashboard - New Figma-based dashboard
+  if (activeView === 'enhanced-dashboard') {
     return (
-      <EnhancedApplicationDetail
-        applicationId={selectedApplicationId}
-        onBack={() => setSelectedApplicationId(null)}
+      <EnhancedLenderDashboard 
+        onApplicationClick={(applicationId) => setSelectedApplicationId(applicationId)}
       />
     );
   }
@@ -115,14 +131,15 @@ const LenderDashboard = () => {
   }
 
   // Loan Products Page - With laptop illustration
-  if (activeView === 'loan-products') {
-    return (
-      <LoanProductsPage 
-        onNavigateToLoanBuilder={() => setActiveView('loan-builder')}
-        onNavigateToSettings={() => setActiveView('settings')}
-      />
-    );
-  }
+        if (activeView === 'loan-products') {
+          return (
+            <LoanProductsPage
+              onNavigateToLoanBuilder={() => setActiveView('loan-builder')}
+              onNavigateToSettings={() => setActiveView('settings')}
+              loanProducts={loanProducts}
+            />
+          );
+        }
 
   // If loan builder is active, show the loan builder flow
   if (activeView === 'loan-builder') {
@@ -161,6 +178,17 @@ const LenderDashboard = () => {
         <div className="px-4 flex-1">
           <nav className="space-y-1">
             <button
+              onClick={() => setActiveView('enhanced-dashboard')}
+              className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-[16px] font-medium ${
+                activeView === 'enhanced-dashboard' 
+                  ? 'bg-[#eaecf0] text-[#101828]' 
+                  : 'text-[#344054] hover:bg-gray-50'
+              }`}
+            >
+              <BarChart2 className="w-6 h-6" />
+              Dashboard
+            </button>
+            <button
               onClick={() => setActiveView('dashboard')}
               className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-[16px] font-medium ${
                 activeView === 'dashboard' 
@@ -168,8 +196,8 @@ const LenderDashboard = () => {
                   : 'text-[#344054] hover:bg-gray-50'
               }`}
             >
-              <BarChart2 className="w-6 h-6" />
-              Dashboard
+              <Layers3 className="w-6 h-6" />
+              Classic Dashboard
             </button>
             <button
               onClick={() => setActiveView('loan-approvals')}

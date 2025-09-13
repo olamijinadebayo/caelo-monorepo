@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { LoginForm } from '../components/ui/login-form';
 import { SignUpForm } from '../components/ui/sign-up-form';
+import LenderLogin from '../components/auth/LenderLogin';
 import AdminDashboard from '../components/dashboards/AdminDashboard';
 import AnalystDashboard from '../components/dashboards/AnalystDashboard';
 import BorrowerDashboard from '../components/dashboards/BorrowerDashboard';
@@ -37,7 +38,12 @@ const Index = () => {
     }
   }
 
-  // Landing page for unauthenticated users
+  // If in sign-in mode, show full-screen Figma login
+  if (!isSignUp) {
+    return <LenderLogin />;
+  }
+
+  // Landing page for sign-up mode
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Header */}
@@ -51,10 +57,10 @@ const Index = () => {
             <span className="text-2xl font-bold text-foreground">{branding.name}</span>
           </div>
           <nav className="hidden md:flex items-center space-x-6">
-            <Button variant={isSignUp ? "outline" : "default"} onClick={() => setIsSignUp(false)}>
+            <Button variant="outline" onClick={() => setIsSignUp(false)}>
               Sign In
             </Button>
-            <Button variant={isSignUp ? "default" : "outline"} onClick={() => setIsSignUp(true)}>
+            <Button variant="default">
               Sign Up
             </Button>
           </nav>
@@ -72,13 +78,9 @@ const Index = () => {
               : "Empowering community lenders with relationship-first technology."}
           </p>
         </div>
-        {/* Right Column - Auth Form */}
+        {/* Right Column - Sign Up Form */}
         <div className="flex justify-center lg:justify-end w-full lg:w-1/2">
-          {isSignUp ? (
-            <SignUpForm onToggleMode={toggleMode} />
-          ) : (
-            <LoginForm />
-          )}
+          <SignUpForm onToggleMode={toggleMode} />
         </div>
       </main>
       {/* Footer */}

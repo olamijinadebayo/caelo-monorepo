@@ -249,12 +249,12 @@ export default function AdminDashboard() {
             {activeTab === 'applications' ? (
               // Applications View
               <div>
-                {selectedApplication ? (
-                  <EnhancedApplicationDetail
-                    applicationId={selectedApplication.id as any}
-                    onBack={() => setSelectedApplication(null)}
-                  />
-                ) : (
+        {selectedApplication ? (
+          <EnhancedApplicationDetail
+            applicationId={selectedApplication.id as ApplicationId}
+            onBack={() => setSelectedApplication(null)}
+          />
+        ) : (
                   <ApplicationQueue
                     onApplicationSelect={setSelectedApplication}
                     selectedApplicationId={selectedApplication?.id}
