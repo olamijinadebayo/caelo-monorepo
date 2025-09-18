@@ -21,7 +21,7 @@ export function SignUpForm({ onToggleMode }: SignUpFormProps) {
   const { toast } = useToast();
   const { register, handleSubmit, formState: { errors }, watch } = useForm();
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: Record<string, unknown>) => {
     setIsLoading(true);
     try {
       // TODO: Connect to backend when available

@@ -86,7 +86,7 @@ export default function ApplicationQueue({ onApplicationSelect, selectedApplicat
   };
 
   const filterAndSortApplications = () => {
-    let filtered = applications.filter(app => {
+    const filtered = applications.filter(app => {
       const matchesSearch = 
         app.borrowerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         app.businessName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -100,7 +100,7 @@ export default function ApplicationQueue({ onApplicationSelect, selectedApplicat
 
     // Sort applications
     filtered.sort((a, b) => {
-      let aValue: any, bValue: any;
+      let aValue: string | number, bValue: string | number;
       
       switch (sortBy) {
         case 'date':

@@ -241,7 +241,7 @@ class LoanApplicationService {
     return `loan_applications_${key}`;
   }
 
-  private async makeApiRequest(endpoint: string, options: RequestInit = {}): Promise<any> {
+  private async makeApiRequest(endpoint: string, options: RequestInit = {}): Promise<unknown> {
     try {
       const response = await fetch(`${API_BASE_URL}/api${endpoint}`, {
         headers: {
@@ -353,7 +353,7 @@ class LoanApplicationService {
     } catch (error) {
       // Fallback to localStorage
       const stored = localStorage.getItem(this.getStorageKey('applications'));
-      let applications = stored ? JSON.parse(stored) as LoanApplication[] : [...mockApplications];
+      const applications = stored ? JSON.parse(stored) as LoanApplication[] : [...mockApplications];
       
       const applicationIndex = applications.findIndex(app => app.id === id);
       if (applicationIndex === -1) {
@@ -399,7 +399,7 @@ class LoanApplicationService {
     } catch (error) {
       // Fallback to localStorage
       const stored = localStorage.getItem(this.getStorageKey('applications'));
-      let applications = stored ? JSON.parse(stored) as LoanApplication[] : [...mockApplications];
+      const applications = stored ? JSON.parse(stored) as LoanApplication[] : [...mockApplications];
       
       const applicationIndex = applications.findIndex(app => app.id === id);
       if (applicationIndex === -1) {

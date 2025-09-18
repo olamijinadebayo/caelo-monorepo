@@ -17,6 +17,7 @@ import { loanApplicationService } from '../../services/loanApplications';
 import { LoanApplication } from '../../types/loanApplications';
 import ApplicationQueue from './ApplicationQueue';
 import ApplicationDetail from './ApplicationDetail';
+import EnhancedApplicationDetail from './EnhancedApplicationDetail';
 import { 
   Plus, 
   Edit, 
@@ -248,24 +249,12 @@ export default function AdminDashboard() {
             {activeTab === 'applications' ? (
               // Applications View
               <div>
-                {selectedApplication ? (
-                  <ApplicationDetail
-                    application={selectedApplication}
-                    onBack={() => setSelectedApplication(null)}
-                    onApplicationUpdate={(updatedApplication) => {
-                      setApplications(prev => 
-                        prev.map(app => app.id === updatedApplication.id ? updatedApplication : app)
-                      );
-                      setSelectedApplication(updatedApplication);
-                      // Highlight the updated application when returning to queue
-                      setHighlightedApplicationId(updatedApplication.id);
-                      // Clear highlight after 3 seconds
-                      setTimeout(() => {
-                        setHighlightedApplicationId(null);
-                      }, 3000);
-                    }}
-                  />
-                ) : (
+        {selectedApplication ? (
+          <EnhancedApplicationDetail
+            applicationId={selectedApplication.id as ApplicationId}
+            onBack={() => setSelectedApplication(null)}
+          />
+        ) : (
                   <ApplicationQueue
                     onApplicationSelect={setSelectedApplication}
                     selectedApplicationId={selectedApplication?.id}
