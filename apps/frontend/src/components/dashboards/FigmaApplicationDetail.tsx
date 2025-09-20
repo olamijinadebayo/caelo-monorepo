@@ -43,6 +43,25 @@ export const FigmaApplicationDetail: React.FC<FigmaApplicationDetailProps> = ({
   const [messageSidebarTab, setMessageSidebarTab] = useState<'team-note' | 'message-user'>('team-note');
   const [isAddingNote, setIsAddingNote] = useState(false);
   const [newNoteText, setNewNoteText] = useState('');
+  
+  // Chat messages state
+  const [messages, setMessages] = useState([
+    {
+      id: 1,
+      text: "Hi, this is the lender team reaching to learn more about your request",
+      sender: "lender",
+      timestamp: "8:00 PM",
+      avatar: null
+    },
+    {
+      id: 2,
+      text: "Okay No problem",
+      sender: "user",
+      timestamp: "8:00 PM",
+      avatar: "MR"
+    }
+  ]);
+  const [newMessageText, setNewMessageText] = useState('');
   const [teamNotes, setTeamNotes] = useState([
     {
       id: 1,
@@ -71,6 +90,41 @@ export const FigmaApplicationDetail: React.FC<FigmaApplicationDetailProps> = ({
       isCurrentUser: false,
       timestamp: '45 mins ago',
       content: "NSF incidents are concerning but borrower's explanation seems reasonable. Strong business fundamentals otherwise. Need to discuss with risk committee."
+    },
+    {
+      id: 5,
+      author: 'Sarah Johnson',
+      isCurrentUser: false,
+      timestamp: '2 hours ago',
+      content: "Credit verification completed. FICO score is 742, well within our approval range. No recent derogatory marks found."
+    },
+    {
+      id: 6,
+      author: 'Michael Davis',
+      isCurrentUser: false,
+      timestamp: '3 hours ago',
+      content: "Employment verification received. Applicant confirmed as full-time employee with stable income for past 2 years."
+    },
+    {
+      id: 7,
+      author: 'Emily Chen',
+      isCurrentUser: false,
+      timestamp: '4 hours ago',
+      content: "Reviewed bank statements for last 3 months. Regular deposits match stated income. Minimal overdraft activity."
+    },
+    {
+      id: 8,
+      author: 'Robert Wilson',
+      isCurrentUser: false,
+      timestamp: '5 hours ago',
+      content: "Initial document review complete. All required forms submitted and appear authentic. Processing can continue."
+    },
+    {
+      id: 9,
+      author: 'Amanda Liu',
+      isCurrentUser: false,
+      timestamp: '1 day ago',
+      content: "Application received and assigned. Customer has existing checking account relationship since 2019."
     }
   ]);
 
@@ -92,6 +146,20 @@ export const FigmaApplicationDetail: React.FC<FigmaApplicationDetailProps> = ({
   const handleCancelAddNote = () => {
     setNewNoteText('');
     setIsAddingNote(false);
+  };
+
+  const handleSendMessage = () => {
+    if (newMessageText.trim()) {
+      const newMessage = {
+        id: messages.length + 1,
+        text: newMessageText.trim(),
+        sender: "lender" as const,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        avatar: null
+      };
+      setMessages([...messages, newMessage]);
+      setNewMessageText('');
+    }
   };
 
   const progressSteps = [
@@ -787,29 +855,804 @@ export const FigmaApplicationDetail: React.FC<FigmaApplicationDetailProps> = ({
             )}
             
             {activeTab === 'relationship' && (
-              <div className="border w-full bg-white mt-4 p-7 rounded-2xl border-solid border-[#D0D5DD] max-md:max-w-full max-md:px-5">
-                <div className="text-center py-20">
-                  <h3 className="text-xl font-semibold text-[#101828] mb-2">Relationship & Impact</h3>
-                  <p className="text-[#667085]">This section is under development</p>
+              <div className="w-full mt-4">
+                {/* Loan Purpose & Impact Summary */}
+                <div className="bg-slate-50 border border-slate-200 rounded-[20px] p-[30px] mb-6">
+                  <div className="flex items-start justify-between w-full">
+                    <div className="flex flex-col gap-8 w-[615px]">
+                      {/* Title */}
+                      <div className="flex gap-2 items-center">
+                        <div className="w-6 h-6">
+                          <svg className="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+                            <polyline points="14,2 14,8 20,8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                            <polyline points="10,9 9,9 8,9"/>
+                          </svg>
+                        </div>
+                        <h2 className="text-[20px] font-medium text-gray-900 leading-6">
+                          Loan Purpose & Impact Summary
+                        </h2>
+                      </div>
+                      
+                      {/* Description */}
+                      <p className="text-[16px] font-normal text-black leading-6">
+                        The borrower plans to open a second retail location, expected to increase annual revenue by 30%. This project is projected to create 3 new jobs and retain 2 existing positions, serving a historically underserved neighborhood and expanding access to affordable groceries. The project aligns with the CDFI's strategic goal of supporting minority-owned businesses and local economic development.
+                      </p>
+                    </div>
+                    
+                    {/* Metrics Card */}
+                    <div className="bg-white border border-[#eaecf0] rounded-lg p-5 w-[539px]">
+                      <div className="flex gap-6 items-start">
+                        <div className="flex flex-col gap-3 flex-1">
+                          <div className="text-[#667085] text-[14px] font-medium leading-5">
+                            Revenue Increase
+                          </div>
+                          <div className="text-green-600 text-[16px] font-medium leading-6">
+                            30%
+                          </div>
+                        </div>
+                        
+                        <div className="w-[1px] h-14 bg-[#eaecf0]"></div>
+                        
+                        <div className="flex flex-col gap-3 flex-1">
+                          <div className="text-[#667085] text-[14px] font-medium leading-5">
+                            Total Jobs Impact
+                          </div>
+                          <div className="text-black text-[16px] font-medium leading-6">
+                            5
+                          </div>
+                        </div>
+                        
+                        <div className="w-[1px] h-14 bg-[#eaecf0]"></div>
+                        
+                        <div className="flex flex-col gap-3 flex-1">
+                          <div className="text-[#667085] text-[14px] font-medium leading-5">
+                            New Location
+                          </div>
+                          <div className="text-black text-[16px] font-medium leading-6">
+                            1
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Relationship History */}
+                <div className="bg-white border border-[#eaecf0] rounded-lg p-[30px] mb-6">
+                  {/* Title */}
+                  <div className="flex gap-2 items-center mb-10">
+                    <div className="w-6 h-6">
+                      <svg className="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                      </svg>
+                    </div>
+                    <h2 className="text-[20px] font-medium text-gray-900 leading-6">
+                      Relationship History
+                    </h2>
+                  </div>
+
+                  <div className="flex flex-col gap-6">
+                    {/* Length of Relationship */}
+                    <div className="flex flex-col gap-3 max-w-[203px]">
+                      <div className="text-[#667085] text-[14px] font-medium leading-5">
+                        Length of Relationship with CDFI
+                      </div>
+                      <div className="text-black text-[16px] font-medium leading-6">
+                        Client since 2025 (2 years).
+                      </div>
+                    </div>
+
+                    <div className="h-[1px] bg-[#eaecf0] w-full"></div>
+
+                    {/* Past History */}
+                    <div className="flex flex-col gap-3">
+                      <div className="text-[#667085] text-[14px] font-medium leading-5">
+                        Past History
+                      </div>
+                      <div className="text-black text-[16px] font-medium leading-6">
+                        2 previous microloans of $5000 and $10000. 100% on-time payments across 2 prior loans and payments are complete
+                      </div>
+                    </div>
+
+                    <div className="h-[1px] bg-[#eaecf0] w-full"></div>
+
+                    {/* Technical Assistance Engagement */}
+                    <div className="flex flex-col gap-3">
+                      <div className="text-[#667085] text-[14px] font-medium leading-5">
+                        Technical Assistance Engagement
+                      </div>
+                      <div className="text-black text-[16px] font-medium leading-6">
+                        Attended 3 business planning sessions in the past year.
+                      </div>
+                    </div>
+
+                    {/* Referral Source */}
+                    <div className="flex flex-col gap-3">
+                      <div className="text-[#667085] text-[14px] font-medium leading-5">
+                        Referral Source
+                      </div>
+                      <div className="text-black text-[16px] font-medium leading-6">
+                        Referred by Local Chamber of Commerce.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Community Impact */}
+                <div className="bg-slate-50 border border-[#eaecf0] rounded-lg p-[30px]">
+                  {/* Title */}
+                  <div className="flex gap-2 items-center mb-10">
+                    <div className="w-6 h-6">
+                      <svg className="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="2" y1="12" x2="22" y2="12"/>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                      </svg>
+                    </div>
+                    <h2 className="text-[20px] font-medium text-gray-900 leading-6">
+                      Community Impact
+                    </h2>
+                  </div>
+
+                  <div className="flex gap-10">
+                    {/* Left Column */}
+                    <div className="flex-1 flex flex-col gap-6">
+                      {/* Geographic Impact */}
+                      <div className="flex flex-col gap-3">
+                        <div className="text-[#667085] text-[14px] font-medium leading-5">
+                          Geographic Impact
+                        </div>
+                        <div className="text-black text-[16px] font-medium leading-6">
+                          Serving historically underserved neighborhood, expanding access to affordable groceries
+                        </div>
+                      </div>
+
+                      <div className="h-[1px] bg-[#eaecf0] w-full"></div>
+
+                      {/* Borrower Testimonial */}
+                      <div className="flex flex-col gap-3">
+                        <div className="text-[#667085] text-[14px] font-medium leading-5">
+                          Borrower Testimonial
+                        </div>
+                        <div className="bg-white border border-[#eaecf0] rounded-lg p-5">
+                          <div className="flex flex-col gap-6">
+                            <div className="flex flex-col gap-3">
+                              <div className="text-[#667085] text-[14px] font-medium leading-6">
+                                "This CDFI has been instrumental in helping me grow my business. Their support goes beyond just financing - the business planning sessions helped me develop a solid expansion strategy. I'm excited to serve more families in our community with fresh, affordable groceries."
+                              </div>
+                              <div className="text-black text-[16px] font-medium leading-6">
+                                Annabel
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right Column */}
+                    <div className="flex-1 flex flex-col gap-8">
+                      {/* Jobs Impact Card */}
+                      <div className="bg-white border border-[#eaecf0] rounded-lg p-5">
+                        <div className="flex flex-col gap-6">
+                          <div className="flex flex-col gap-3 max-w-[203px]">
+                            <div className="text-[#667085] text-[14px] font-medium leading-5">
+                              New Jobs
+                            </div>
+                            <div className="text-green-600 text-[16px] font-medium leading-6">
+                              2
+                            </div>
+                          </div>
+
+                          <div className="h-[1px] bg-[#eaecf0] w-full"></div>
+
+                          <div className="flex flex-col gap-3 max-w-[203px]">
+                            <div className="text-[#667085] text-[14px] font-medium leading-5">
+                              Retained Jobs
+                            </div>
+                            <div className="text-black text-[16px] font-medium leading-6">
+                              1
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Strategic Alignment */}
+                      <div className="border border-[#eaecf0] rounded-[10px] p-6">
+                        <div className="flex gap-3">
+                          <div className="w-6 h-6 flex-shrink-0">
+                            <svg className="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                          </div>
+                          <div className="flex flex-col gap-2">
+                            <div className="text-slate-950 text-[16px] font-medium leading-6">
+                              Strategic Alignment
+                            </div>
+                            <div className="text-black text-[14px] font-normal leading-[1.6]">
+                              Supports minority-owned businesses and local economic development goals
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
             
             {activeTab === 'financial-stability' && (
-              <div className="border w-full bg-white mt-4 p-7 rounded-2xl border-solid border-[#D0D5DD] max-md:max-w-full max-md:px-5">
-                <div className="text-center py-20">
-                  <h3 className="text-xl font-semibold text-[#101828] mb-2">Business & Personal Financial Stability</h3>
-                  <p className="text-[#667085]">This section is under development</p>
+              <div className="w-full mt-4">
+                <h1 className="text-[24px] font-semibold text-[#101828] mb-6">Business & Personal Financial Stability</h1>
+                
+                {/* Loan Purpose & Impact Summary */}
+                <div className="bg-slate-50 border border-slate-200 rounded-[20px] p-[30px] mb-6">
+                  <div className="flex gap-2 items-center mb-4">
+                    <div className="w-6 h-6">
+                      <svg className="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+                        <polyline points="14,2 14,8 20,8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                      </svg>
+                    </div>
+                    <h2 className="text-[20px] font-medium text-gray-900">Loan Purpose & Impact Summary</h2>
+                  </div>
+                  <p className="text-[16px] font-normal text-black leading-6 mb-4">
+                    The borrower operates from <span className="text-orange-500">commercial structure expansion selected at business revenues (REIT entity statement)</span>
+                  </p>
+                  <p className="text-green-600 text-[16px] font-medium">
+                    Low income area throughout, within expected seasonal patterns.
+                  </p>
+                </div>
+
+                {/* Point-of-Sale (POS) Data Analysis */}
+                <div className="bg-white border border-[#eaecf0] rounded-lg p-[30px] mb-6">
+                  <div className="flex gap-2 items-center mb-10">
+                    <div className="w-6 h-6">
+                      <svg className="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                        <line x1="8" y1="21" x2="16" y2="21"/>
+                        <line x1="12" y1="17" x2="12" y2="21"/>
+                      </svg>
+                    </div>
+                    <h2 className="text-[20px] font-medium text-gray-900">Point-of-Sale (POS) Data Analysis</h2>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-6 text-[14px]">
+                    <div>
+                      <div className="text-[#667085] font-medium mb-2">Customer profile trends & spending</div>
+                      <div className="text-black font-medium">Consistent performance indicating strong customer base loyalty. Revenue sources are well distributed.</div>
+                    </div>
+
+                    <div>
+                      <div className="text-[#667085] font-medium mb-2">Frequency and variety of features</div>
+                      <div className="text-black font-medium">Customer churn trends, 5% with top returning visitors.</div>
+                    </div>
+
+                    <div>
+                      <div className="text-[#667085] font-medium mb-2">Seasonality (processing consistency)</div>
+                      <div className="text-black font-medium">2024 transaction volume averaging $20K/month vs. major disruptions.</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Personal Financial Stability & Behavioral Insights */}
+                <div className="bg-white border border-[#eaecf0] rounded-lg p-[30px] mb-6">
+                  <div className="flex gap-2 items-center mb-10">
+                    <div className="w-6 h-6">
+                      <svg className="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                      </svg>
+                    </div>
+                    <h2 className="text-[20px] font-medium text-gray-900">Personal Financial Stability & Behavioral Insights</h2>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-6 text-[14px]">
+                    <div>
+                      <div className="text-[#667085] font-medium mb-2">Non-credit and income behavior</div>
+                      <div className="text-black font-medium">Over the past two 30-60 days not consistent as from supporting ones are existing</div>
+                    </div>
+
+                    <div>
+                      <div className="text-[#667085] font-medium mb-2">Debt allocation summary</div>
+                      <div className="text-green-600 font-medium">Credit utilization trends 20% vs the expected ratios within those over the past 6 months</div>
+                    </div>
+
+                    <div>
+                      <div className="text-[#667085] font-medium mb-2">No frequency of income sources</div>
+                      <div className="text-black font-medium">Monthly annual revenue: $120,000 through four retailers and super-discount</div>
+                    </div>
+
+                    <div>
+                      <div className="text-[#667085] font-medium mb-2">Earnings schedule/history</div>
+                      <div className="text-black font-medium">14 years food industry experience, 6 years operating current business</div>
+                    </div>
+
+                    <div>
+                      <div className="text-[#667085] font-medium mb-2">Non-performance judgments / risk items</div>
+                      <div className="text-black font-medium">Account 1 left frequency</div>
+                    </div>
+
+                    <div>
+                      <div className="text-black font-medium">No significant regulatory in the past 12 months, 2 minor expenses over the past 6 months</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Business Financial Stability & Behavioral Insights */}
+                <div className="bg-white border border-[#eaecf0] rounded-lg p-[30px] mb-6">
+                  <div className="flex gap-2 items-center mb-10">
+                    <div className="w-6 h-6">
+                      <svg className="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                        <path d="M2 17l10 5 10-5"/>
+                        <path d="M2 12l10 5 10-5"/>
+                      </svg>
+                    </div>
+                    <h2 className="text-[20px] font-medium text-gray-900">Business Financial Stability & Behavioral Insights</h2>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-8">
+                    {/* Left Column */}
+                    <div className="space-y-6">
+                      <div>
+                        <div className="text-[#667085] font-medium mb-2 text-[14px]">Current Revenue and Liquidity</div>
+                        <div className="text-green-600 font-medium text-[16px]">Average 18 sequential net results so page ranges from 15k to between business revenues</div>
+                      </div>
+
+                      <div>
+                        <div className="text-[#667085] font-medium mb-2 text-[14px]">Gross Margin %</div>
+                        <div className="text-black font-medium text-[16px]">25%</div>
+                      </div>
+
+                      <div>
+                        <div className="text-[#667085] font-medium mb-2 text-[14px]">Key business performance measure to the past year</div>
+                      </div>
+
+                      <div>
+                        <div className="text-[#667085] font-medium mb-2 text-[14px]">Business Growth (%)</div>
+                      </div>
+
+                      <div>
+                        <div className="text-[#667085] font-medium mb-2 text-[14px]">Net Income Margin (%)</div>
+                        <div className="text-black font-medium text-[16px]">8%</div>
+                      </div>
+
+                      <div>
+                        <div className="text-[#667085] font-medium mb-2 text-[14px]">Payments history</div>
+                        <div className="text-black font-medium text-[16px]">Good throughout 95% tax compliance basis since over the last 24 months</div>
+                      </div>
+
+                      <div>
+                        <div className="text-[#667085] font-medium mb-2 text-[14px]">Cashflow Seasonality</div>
+                        <div className="text-black font-medium text-[16px]">20%</div>
+                      </div>
+
+                      <div>
+                        <div className="text-[#667085] font-medium mb-2 text-[14px]">Inventory turnover</div>
+                        <div className="text-green-600 font-medium text-[16px]">Average inventory value above peak performance, avoiding financial problems</div>
+                      </div>
+                    </div>
+
+                    {/* Right Column - Key Metrics */}
+                    <div className="space-y-6">
+                      <div className="bg-slate-50 p-4 rounded-lg">
+                        <div className="text-[#667085] font-medium mb-2 text-[12px]">Debt to Income Ratio</div>
+                        <div className="text-black font-bold text-[24px]">15%</div>
+                      </div>
+
+                      <div className="bg-slate-50 p-4 rounded-lg">
+                        <div className="text-[#667085] font-medium mb-2 text-[12px]">Debt Service Coverage Ratio</div>
+                        <div className="text-black font-bold text-[24px]">1.8x</div>
+                      </div>
+
+                      <div className="bg-slate-50 p-4 rounded-lg">
+                        <div className="text-[#667085] font-medium mb-2 text-[12px]">Savings in Assets</div>
+                        <div className="text-black font-bold text-[24px]">$45k</div>
+                      </div>
+
+                      <div className="bg-slate-50 p-4 rounded-lg">
+                        <div className="text-[#667085] font-medium mb-2 text-[12px]">Current Ratio</div>
+                        <div className="text-black font-bold text-[24px]">2.1</div>
+                      </div>
+
+                      <div className="bg-slate-50 p-4 rounded-lg">
+                        <div className="text-[#667085] font-medium mb-2 text-[12px]">Business FICO</div>
+                        <div className="text-black font-bold text-[24px]">78</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tax Return Verification */}
+                <div className="bg-white border border-[#eaecf0] rounded-lg p-[30px]">
+                  <div className="flex gap-2 items-center mb-10">
+                    <div className="w-6 h-6">
+                      <svg className="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+                        <polyline points="14,2 14,8 20,8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                      </svg>
+                    </div>
+                    <h2 className="text-[20px] font-medium text-gray-900">Tax Return Verification</h2>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-6 text-[14px]">
+                    <div>
+                      <div className="text-[#667085] font-medium mb-2">Files Returns</div>
+                      <div className="text-green-600 font-medium">Yes (Scheduled tax returns for 2022 - Filed on time)</div>
+                    </div>
+
+                    <div>
+                      <div className="text-[#667085] font-medium mb-2">Revenue stated</div>
+                      <div className="text-black font-medium">Equivalent trends $115,000 tax down-trends $117,000; 1.5% variance goals</div>
+                    </div>
+
+                    <div>
+                      <div className="text-[#667085] font-medium mb-2">Compliant</div>
+                      <div className="text-black font-medium">Business and profit at all plans, and key filings 12%</div>
+                    </div>
+
+                    <div>
+                      <div className="text-[#667085] font-medium mb-2">Business Structure/entity</div>
+                      <div className="text-green-600 font-medium">Yes, significant business license, liquidity, or top and hardware business</div>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
             
             {activeTab === 'documents' && (
-              <div className="border w-full bg-white mt-4 p-7 rounded-2xl border-solid border-[#D0D5DD] max-md:max-w-full max-md:px-5">
-                <div className="text-center py-20">
-                  <h3 className="text-xl font-semibold text-[#101828] mb-2">Financials & Supporting Documents</h3>
-                  <p className="text-[#667085]">This section is under development</p>
+              <div className="w-full mt-4">
+                <h1 className="text-[24px] font-medium text-slate-950 mb-6 tracking-[-0.72px] leading-8">
+                  Business & Personal Financial Stability
+                </h1>
+
+                <div className="space-y-6">
+                  {/* Loan Purpose & Impact Summary */}
+                  <div className="bg-slate-50 border border-slate-200 rounded-[20px] p-[30px]">
+                    <div className="mb-6">
+                      <div className="flex gap-2 items-center mb-4">
+                        <div className="w-6 h-6">
+                          <svg className="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M10 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8l-2-2z"/>
+                          </svg>
+                        </div>
+                        <h2 className="text-[20px] font-medium text-gray-900">Loan Purpose & Impact Summary</h2>
+                      </div>
+                    </div>
+
+                    <div className="bg-white border border-[#eaecf0] rounded-lg p-8">
+                      <div className="space-y-6">
+                        <div>
+                          <div className="text-[#667085] text-[14px] font-medium mb-3">Personal-business fund mingling</div>
+                          <div className="text-yellow-600 text-[16px] font-medium leading-6">
+                            Occasional personal expenses detected in business account ($124.56 at Walmart).
+                          </div>
+                        </div>
+
+                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
+
+                        <div>
+                          <div className="text-[#667085] text-[14px] font-medium mb-3">Frequency and volume of mingling</div>
+                          <div className="text-green-600 text-[16px] font-medium leading-6">
+                            Low volume and infrequent, within expected seasonal patterns.
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Point-of-Sale (POS) Data Analysis */}
+                  <div className="bg-slate-50 border border-slate-200 rounded-[20px] p-[30px]">
+                    <div className="mb-6">
+                      <div className="flex gap-2 items-center mb-4">
+                        <div className="w-6 h-6">
+                          <svg className="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M7 13c0 2.21 1.79 4 4 4s4-1.79 4-4-1.79-4-4-4-4 1.79-4 4zm8.39 5.56c-.64-.22-1.27-.46-1.89-.72l.72-1.94c.5.2 1.02.36 1.54.48l-.37 2.18zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                          </svg>
+                        </div>
+                        <h2 className="text-[20px] font-medium text-gray-900">Point-of-Sale (POS) Data Analysis</h2>
+                      </div>
+                    </div>
+
+                    <div className="bg-white border border-[#eaecf0] rounded-lg p-8 flex-1">
+                      <div className="space-y-6">
+                        <div>
+                          <div className="text-[#667085] text-[14px] font-medium mb-3">Customer portfolio health & diversity</div>
+                          <div className="text-yellow-600 text-[16px] font-medium leading-6">
+                            80% repeat customers indicating strong customer loyalty. Revenue sources are well diversified.
+                          </div>
+                        </div>
+
+                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
+
+                        <div>
+                          <div className="text-[#667085] text-[14px] font-medium mb-3">Frequency and nature of disputes</div>
+                          <div className="text-green-600 text-[16px] font-medium leading-6">
+                            Dispute rate below 1%, with no recurring issues.
+                          </div>
+                        </div>
+
+                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
+
+                        <div>
+                          <div className="text-[#667085] text-[14px] font-medium mb-3">Transaction processing consistency</div>
+                          <div className="text-green-600 text-[16px] font-medium leading-6">
+                            Stable transaction volume averaging $50,000/month, no major disruptions.
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Personal Financial Stability & Behavioral Insights */}
+                  <div className="bg-slate-50 border border-slate-200 rounded-[20px] p-[30px]">
+                    <div className="mb-6">
+                      <div className="flex gap-2 items-center mb-4">
+                        <div className="w-6 h-6">
+                          <svg className="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+                          </svg>
+                        </div>
+                        <h2 className="text-[20px] font-medium text-gray-900">Personal Financial Stability & Behavioral Insights</h2>
+                      </div>
+                    </div>
+
+                    <div className="bg-white border border-[#eaecf0] rounded-lg p-8">
+                      <div className="space-y-6">
+                        <div>
+                          <div className="text-[#667085] text-[14px] font-medium mb-3">Debt levels and repayment behavior</div>
+                          <div className="text-yellow-600 text-[16px] font-medium leading-6">
+                            Low personal debt ($5,000) with consistent on-time repayments over 24 months.
+                          </div>
+                        </div>
+
+                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
+
+                        <div>
+                          <div className="text-[#667085] text-[14px] font-medium mb-3">Credit utilization and history</div>
+                          <div className="text-green-600 text-[16px] font-medium leading-6">
+                            Credit utilization under 25%, no late payments, stable credit score over the past 6 months.
+                          </div>
+                        </div>
+
+                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
+
+                        <div>
+                          <div className="text-[#667085] text-[14px] font-medium mb-3">Verification of income sources</div>
+                          <div className="text-green-600 text-[16px] font-medium leading-6">
+                            Verified annual income of $100,000 through tax returns and bank deposits.
+                          </div>
+                        </div>
+
+                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
+
+                        <div>
+                          <div className="text-[#667085] text-[14px] font-medium mb-3">Experience in business/industry</div>
+                          <div className="text-green-600 text-[16px] font-medium leading-6">
+                            12 years total industry experience, 8 years operating current business.
+                          </div>
+                        </div>
+
+                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
+
+                        <div>
+                          <div className="text-[#667085] text-[14px] font-medium mb-3">Open Bankruptcies, Judgements, Liens & More</div>
+                          <div className="text-green-600 text-[16px] font-medium leading-6">
+                            No
+                          </div>
+                        </div>
+
+                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
+
+                        <div>
+                          <div className="text-[#667085] text-[14px] font-medium mb-3">Overdraft & NSF frequency</div>
+                          <div className="text-green-600 text-[16px] font-medium leading-6">
+                            No overdrafts reported in the past 18 months. 2 NSFs reported over the past 6 months.
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Business Financial Stability & Behavioral Insights */}
+                  <div className="bg-slate-50 border border-slate-200 rounded-[20px] p-[30px]">
+                    <div className="mb-6">
+                      <div className="flex gap-2 items-center mb-4">
+                        <div className="w-6 h-6">
+                          <svg className="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                          </svg>
+                        </div>
+                        <h2 className="text-[20px] font-medium text-gray-900">Business Financial Stability & Behavioral Insights</h2>
+                      </div>
+                    </div>
+
+                    <div className="bg-white border border-[#eaecf0] rounded-lg p-5 flex justify-between">
+                      {/* Left Column */}
+                      <div className="w-[548px] space-y-6">
+                        <div>
+                          <div className="text-[#667085] text-[14px] font-medium mb-3">Deposit frequency and regularity</div>
+                          <div className="text-green-600 text-[16px] font-medium leading-6">
+                            Average 15 deposits per month, no gaps longer than 10 days between deposits.
+                          </div>
+                        </div>
+
+                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
+
+                        <div>
+                          <div className="text-[#667085] text-[14px] font-medium mb-3">Gross Margin &gt;= 35%</div>
+                          <div className="text-green-600 text-[16px] font-medium leading-6">
+                            42%, no negative cashflow months in the past year.
+                          </div>
+                        </div>
+
+                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
+
+                        <div>
+                          <div className="text-[#667085] text-[14px] font-medium mb-3">Net Income Margin &gt;5%</div>
+                          <div className="text-green-600 text-[16px] font-medium leading-6">
+                            7%.
+                          </div>
+                        </div>
+
+                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
+
+                        <div>
+                          <div className="text-[#667085] text-[14px] font-medium mb-3">Payment history</div>
+                          <div className="text-green-600 text-[16px] font-medium leading-6">
+                            Clean record with 95% on-time payments over the last 24 months.
+                          </div>
+                        </div>
+
+                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
+
+                        <div>
+                          <div className="text-[#667085] text-[14px] font-medium mb-3">Overdraft frequency</div>
+                          <div className="text-green-600 text-[16px] font-medium leading-6">
+                            No overdrafts reported in the past 18 months.
+                          </div>
+                        </div>
+
+                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
+
+                        <div>
+                          <div className="text-[#667085] text-[14px] font-medium mb-3">Recovery signals</div>
+                          <div className="text-green-600 text-[16px] font-medium leading-6">
+                            Prompt recovery from minor past delinquencies, showing financial discipline.
+                          </div>
+                        </div>
+
+                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
+
+                        <div>
+                          <div className="text-[#667085] text-[14px] font-medium mb-3">Open Judgement, Liens & More</div>
+                          <div className="text-green-600 text-[16px] font-medium leading-6">
+                            No
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Right Column - Financial Metrics */}
+                      <div className="bg-[#fcfcfd] border border-[#eaecf0] rounded-lg px-[50px] py-5 w-[303px] flex flex-col justify-center">
+                        <div className="space-y-6">
+                          <div className="max-w-[203px]">
+                            <div className="text-[#667085] text-[14px] font-medium mb-3">Debt-to-Income (DTI)</div>
+                            <div className="text-black text-[16px] font-medium leading-6">28%</div>
+                          </div>
+
+                          <div className="h-[1px] bg-[#eaecf0] w-full"></div>
+
+                          <div className="max-w-[203px]">
+                            <div className="text-[#667085] text-[14px] font-medium mb-3">Debt Service Coverage Ratio</div>
+                            <div className="text-black text-[16px] font-medium leading-6">1.8x</div>
+                          </div>
+
+                          <div className="h-[1px] bg-[#eaecf0] w-full"></div>
+
+                          <div className="max-w-[203px]">
+                            <div className="text-[#667085] text-[14px] font-medium mb-3">Current Ratio</div>
+                            <div className="text-black text-[16px] font-medium leading-6">2.1</div>
+                          </div>
+
+                          <div className="h-[1px] bg-[#eaecf0] w-full"></div>
+
+                          <div className="max-w-[203px]">
+                            <div className="text-[#667085] text-[14px] font-medium mb-3">Global Debt Service</div>
+                            <div className="text-black text-[16px] font-medium leading-6">35%</div>
+                          </div>
+
+                          <div className="h-[1px] bg-[#eaecf0] w-full"></div>
+
+                          <div className="max-w-[203px]">
+                            <div className="text-[#667085] text-[14px] font-medium mb-3">Return on Equity (ROE)</div>
+                            <div className="text-black text-[16px] font-medium leading-6">15%</div>
+                          </div>
+
+                          <div className="h-[1px] bg-[#eaecf0] w-full"></div>
+
+                          <div className="max-w-[203px]">
+                            <div className="text-[#667085] text-[14px] font-medium mb-3">Return on Assets</div>
+                            <div className="text-black text-[16px] font-medium leading-6">12%</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Tax Return Verification */}
+                  <div className="bg-slate-50 border border-slate-200 rounded-[20px] p-[30px]">
+                    <div className="mb-6">
+                      <div className="flex gap-2 items-center mb-4">
+                        <div className="w-6 h-6">
+                          <svg className="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+                            <polyline points="14,2 14,8 20,8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                          </svg>
+                        </div>
+                        <h2 className="text-[20px] font-medium text-gray-900">Tax Return Verification</h2>
+                      </div>
+                    </div>
+
+                    <div className="bg-white border border-[#eaecf0] rounded-lg p-5">
+                      <div className="space-y-6">
+                        <div>
+                          <div className="text-[#667085] text-[14px] font-medium mb-3">Filing history</div>
+                          <div className="text-yellow-600 text-[16px] font-medium leading-6">
+                            All required tax returns for 2021-2023 filed on time.
+                          </div>
+                        </div>
+
+                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
+
+                        <div>
+                          <div className="text-[#667085] text-[14px] font-medium mb-3">Revenue match</div>
+                          <div className="text-green-600 text-[16px] font-medium leading-6">
+                            Application states $600,000; tax return shows $570,000. 5.3% variance, good.
+                          </div>
+                        </div>
+
+                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
+
+                        <div>
+                          <div className="text-[#667085] text-[14px] font-medium mb-3">Profitability</div>
+                          <div className="text-green-600 text-[16px] font-medium leading-6">
+                            Positive net profit in all years, average margin 14%.
+                          </div>
+                        </div>
+
+                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
+
+                        <div>
+                          <div className="text-[#667085] text-[14px] font-medium mb-3">Business structure match</div>
+                          <div className="text-green-600 text-[16px] font-medium leading-6">
+                            Business structure reported as S-Corp; matches application details.
+                          </div>
+                        </div>
+
+                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
+
+                        <div>
+                          <div className="text-[#667085] text-[14px] font-medium mb-3">Risk flags</div>
+                          <div className="text-green-600 text-[16px] font-medium leading-6">
+                            No significant revenue decline, volatility, or loss carryforwards detected.
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+
+                {/* Bottom separator line */}
+                <div className="h-[1px] bg-[#eaecf0] w-full mt-8"></div>
               </div>
             )}
           </div>
@@ -856,91 +1699,157 @@ export const FigmaApplicationDetail: React.FC<FigmaApplicationDetailProps> = ({
               </div>
               
               {/* Content Area */}
-              <div className="flex-1 flex flex-col justify-between w-full">
+              <div className="flex flex-col h-full w-full">
                 {messageSidebarTab === 'team-note' ? (
                   <>
-                    {/* Team Notes List */}
-                    <div className="flex flex-col gap-3 overflow-y-auto flex-1">
-                      {teamNotes.map((note) => (
-                        <div key={note.id} className="bg-white border border-[#eaecf0] rounded-lg p-5">
-                          <div className="flex flex-col gap-2.5">
-                            <div className="flex items-center justify-between w-full">
-                              <div className="flex gap-1 items-start">
-                                <span className="font-medium text-base text-slate-950">{note.author}</span>
-                                {note.isCurrentUser && (
-                                  <span className="font-medium text-base text-slate-950">(You)</span>
-                                )}
+                    {/* Team Notes List - Fixed Height with Scroll */}
+                    <div className="flex-1 overflow-y-auto min-h-0">
+                      <div className="flex flex-col gap-3 p-1">
+                        {teamNotes.map((note) => (
+                          <div key={note.id} className="bg-white border border-[#eaecf0] rounded-lg p-5 flex-shrink-0">
+                            <div className="flex flex-col gap-2.5">
+                              <div className="flex items-center justify-between w-full">
+                                <div className="flex gap-1 items-start">
+                                  <span className="font-medium text-base text-slate-950">{note.author}</span>
+                                  {note.isCurrentUser && (
+                                    <span className="font-medium text-base text-slate-950">(You)</span>
+                                  )}
+                                </div>
+                                <span className="font-normal text-sm text-slate-500">{note.timestamp}</span>
                               </div>
-                              <span className="font-normal text-sm text-slate-500">{note.timestamp}</span>
+                              <p className="font-normal text-sm text-slate-500 leading-6">
+                                {note.content}
+                              </p>
                             </div>
-                            <p className="font-normal text-sm text-slate-500 leading-6">
-                              {note.content}
-                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Add Note Form or Button - Fixed at Bottom */}
+                    <div className="flex-shrink-0 mt-6 border-t border-[#eaecf0] pt-6">
+                      {isAddingNote ? (
+                        <div className="space-y-4">
+                          <div className="bg-white border border-[#eaecf0] rounded-lg p-5">
+                            <div className="flex flex-col gap-3">
+                              <div className="flex items-center justify-between w-full">
+                                <div className="flex gap-1 items-start">
+                                  <span className="font-medium text-base text-slate-950">Kabir Anifowose</span>
+                                  <span className="font-medium text-base text-slate-950">(You)</span>
+                                </div>
+                                <span className="font-normal text-sm text-slate-500">Just now</span>
+                              </div>
+                              <textarea
+                                value={newNoteText}
+                                onChange={(e) => setNewNoteText(e.target.value)}
+                                placeholder="Add your note here..."
+                                className="w-full p-3 border border-[#d0d5dd] rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#1a2340] focus:border-transparent"
+                                rows={3}
+                                autoFocus
+                              />
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={handleAddNote}
+                              disabled={!newNoteText.trim()}
+                              className="flex-1 bg-[#1a2340] text-[#fff5e6] px-4 py-2.5 rounded-lg font-medium text-base shadow-sm border border-[#fff5e6] disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              Save Note
+                            </button>
+                            <button
+                              onClick={handleCancelAddNote}
+                              className="flex-1 bg-white text-[#344054] px-4 py-2.5 rounded-lg font-medium text-base shadow-sm border border-[#d0d5dd] hover:bg-gray-50"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button 
+                          onClick={() => setIsAddingNote(true)}
+                          className="w-full bg-[#1a2340] text-[#fff5e6] px-4 py-2.5 rounded-lg font-medium text-base shadow-sm border border-[#fff5e6]"
+                        >
+                          Add Note
+                        </button>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex flex-col h-full">
+                    {/* Chat Messages */}
+                    <div className="flex-1 flex flex-col gap-8 overflow-y-auto p-6">
+                      {messages.map((message) => (
+                        <div key={message.id} className={`flex flex-col gap-2.5 ${message.sender === 'lender' ? 'items-end' : 'items-start'} w-full`}>
+                          <div className={`flex gap-2 ${message.sender === 'lender' ? 'flex-row-reverse' : 'flex-row'} items-start`}>
+                            {/* Avatar */}
+                            <div className={`flex-shrink-0 size-[40px] rounded-full flex items-center justify-center ${
+                              message.sender === 'lender' 
+                                ? 'bg-[#bdbdbd]' 
+                                : 'bg-gray-50'
+                            }`}>
+                              {message.sender === 'lender' ? (
+                                <div className="size-[24px] flex items-center justify-center">
+                                  <div className="size-[20px] bg-white rounded-full flex items-center justify-center">
+                                    <div className="size-[16px]">
+                                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                      </svg>
+                                    </div>
+                                  </div>
+                                </div>
+                              ) : (
+                                <span className="font-medium text-[16px] text-[#475467]">
+                                  {message.avatar}
+                                </span>
+                              )}
+                            </div>
+                            
+                            {/* Message Bubble */}
+                            <div className="flex flex-col gap-1 max-w-[362px]">
+                              <div className={`px-3.5 py-2 rounded-[10px] ${
+                                message.sender === 'lender'
+                                  ? 'bg-[#344054] text-white'
+                                  : 'bg-[#f2f4f7] text-black'
+                              }`}>
+                                <p className={`text-[12px] font-normal leading-[20px] tracking-[0.14px]`}>
+                                  {message.text}
+                                </p>
+                              </div>
+                              <span className="text-[#333333] text-[10px] font-normal">
+                                {message.timestamp}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       ))}
                     </div>
-
-                    {/* Add Note Form or Button */}
-                    {isAddingNote ? (
-                      <div className="mt-8 space-y-4">
-                        <div className="bg-white border border-[#eaecf0] rounded-lg p-5">
-                          <div className="flex flex-col gap-3">
-                            <div className="flex items-center justify-between w-full">
-                              <div className="flex gap-1 items-start">
-                                <span className="font-medium text-base text-slate-950">Kabir Anifowose</span>
-                                <span className="font-medium text-base text-slate-950">(You)</span>
-                              </div>
-                              <span className="font-normal text-sm text-slate-500">Just now</span>
-                            </div>
-                            <textarea
-                              value={newNoteText}
-                              onChange={(e) => setNewNoteText(e.target.value)}
-                              placeholder="Add your note here..."
-                              className="w-full p-3 border border-[#d0d5dd] rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#1a2340] focus:border-transparent"
-                              rows={3}
-                              autoFocus
-                            />
-                          </div>
-                        </div>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={handleAddNote}
-                            disabled={!newNoteText.trim()}
-                            className="flex-1 bg-[#1a2340] text-[#fff5e6] px-4 py-2.5 rounded-lg font-medium text-base shadow-sm border border-[#fff5e6] disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            Save Note
-                          </button>
-                          <button
-                            onClick={handleCancelAddNote}
-                            className="flex-1 bg-white text-[#344054] px-4 py-2.5 rounded-lg font-medium text-base shadow-sm border border-[#d0d5dd] hover:bg-gray-50"
-                          >
-                            Cancel
-                          </button>
-                        </div>
+                    
+                    {/* Message Input */}
+                    <div className="border-t border-[#eaecf0] p-6">
+                      <div className="flex gap-3">
+                        <textarea
+                          value={newMessageText}
+                          onChange={(e) => setNewMessageText(e.target.value)}
+                          placeholder="Type your message..."
+                          className="flex-1 p-3 border border-[#d0d5dd] rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#1a2340] focus:border-transparent text-sm"
+                          rows={3}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && !e.shiftKey) {
+                              e.preventDefault();
+                              handleSendMessage();
+                            }
+                          }}
+                        />
+                        <button
+                          onClick={handleSendMessage}
+                          disabled={!newMessageText.trim()}
+                          className="self-end bg-[#1a2340] text-[#fff5e6] px-4 py-2.5 rounded-lg font-medium text-base shadow-sm border border-[#fff5e6] disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          Send
+                        </button>
                       </div>
-                    ) : (
-                      <button 
-                        onClick={() => setIsAddingNote(true)}
-                        className="w-full bg-[#1a2340] text-[#fff5e6] px-4 py-2.5 rounded-lg font-medium text-base shadow-sm border border-[#fff5e6] mt-8"
-                      >
-                        Add Note
-                      </button>
-                    )}
-                  </>
-                ) : (
-                  <div className="flex flex-col items-center justify-center gap-6 h-full px-[119px]">
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="bg-slate-100 p-6 rounded-lg">
-                        <MessageSquare className="w-6 h-6" />
-                      </div>
-                      <p className="text-[#667085] text-sm text-center w-[181px] leading-5">
-                        Send a message to the borrower about this application
-                      </p>
                     </div>
-                    <button className="w-full bg-[#1a2340] text-[#fff5e6] px-4 py-2.5 rounded-lg font-medium text-base shadow-sm border border-[#fff5e6]">
-                      Send Message
-                    </button>
                   </div>
                 )}
               </div>

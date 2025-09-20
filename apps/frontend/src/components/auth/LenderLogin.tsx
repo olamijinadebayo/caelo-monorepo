@@ -7,7 +7,11 @@ const imgEyeIcon = "http://localhost:3845/assets/47e4c009a33da2f51850446ab421c40
 const imgCaeloIcon = "http://localhost:3845/assets/668d60eab65cf7eddb2c7c48c4910ad992800de8.svg";
 const imgCaeloLogo = "http://localhost:3845/assets/c9b9232245e873a3eb623dc83305d97db14e84b0.svg";
 
-const LenderLogin = () => {
+interface LenderLoginProps {
+  onSwitchToSignUp?: () => void;
+}
+
+const LenderLogin: React.FC<LenderLoginProps> = ({ onSwitchToSignUp }) => {
   const [email, setEmail] = useState('mike@cdfi.example.org');
   const [password, setPassword] = useState('demo123');
   const [isLoading, setIsLoading] = useState(false);
@@ -155,6 +159,22 @@ const LenderLogin = () => {
             >
               {isLoading ? 'Logging in...' : 'Login'}
             </button>
+
+            {/* Switch to Sign Up */}
+            {onSwitchToSignUp && (
+              <div className="text-center">
+                <p className="text-sm text-[#525866]">
+                  Don't have an account?{' '}
+                  <button
+                    type="button"
+                    onClick={onSwitchToSignUp}
+                    className="text-[#1a2340] font-medium hover:underline"
+                  >
+                    Create account
+                  </button>
+                </p>
+              </div>
+            )}
           </div>
         </form>
       </div>
