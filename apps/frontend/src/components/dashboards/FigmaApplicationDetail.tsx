@@ -43,6 +43,36 @@ export const FigmaApplicationDetail: React.FC<FigmaApplicationDetailProps> = ({
   const [messageSidebarTab, setMessageSidebarTab] = useState<'team-note' | 'message-user'>('team-note');
   const [isAddingNote, setIsAddingNote] = useState(false);
   const [newNoteText, setNewNoteText] = useState('');
+  const [activeRelationshipSection, setActiveRelationshipSection] = useState<string>('loan-purpose');
+  const [applicationStatus, setApplicationStatus] = useState<'submitted' | 'in-review' | 'approved' | 'rejected' | 'funded'>('in-review');
+  
+  // Intersection Observer for scroll navigation
+  React.useEffect(() => {
+    if (activeTab !== 'relationship') return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveRelationshipSection(entry.target.id);
+          }
+        });
+      },
+      { 
+        root: null, 
+        rootMargin: '-50% 0px -50% 0px',
+        threshold: 0
+      }
+    );
+
+    const sections = ['loan-purpose', 'relationship-history', 'community-impact'];
+    sections.forEach((sectionId) => {
+      const element = document.getElementById(sectionId);
+      if (element) observer.observe(element);
+    });
+
+    return () => observer.disconnect();
+  }, [activeTab]);
   
   // Chat messages state
   const [messages, setMessages] = useState([
@@ -148,6 +178,50 @@ export const FigmaApplicationDetail: React.FC<FigmaApplicationDetailProps> = ({
     setIsAddingNote(false);
   };
 
+  // Scroll navigation for relationship tab
+  const scrollToSection = (sectionId: string) => {
+    setActiveRelationshipSection(sectionId);
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const relationshipSections = [
+    {
+      id: 'loan-purpose',
+      label: 'Loan Purpose & Impact Summary',
+      icon: (
+        <svg className="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+          <polyline points="14,2 14,8 20,8" stroke="currentColor" strokeWidth="2" fill="none"/>
+          <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" strokeWidth="2"/>
+          <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" strokeWidth="2"/>
+        </svg>
+      )
+    },
+    {
+      id: 'relationship-history',
+      label: 'Relationship History',
+      icon: (
+        <svg className="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
+      )
+    },
+    {
+      id: 'community-impact',
+      label: 'Community Impact',
+      icon: (
+        <svg className="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+      )
+    }
+  ];
+
   const handleSendMessage = () => {
     if (newMessageText.trim()) {
       const newMessage = {
@@ -164,9 +238,27 @@ export const FigmaApplicationDetail: React.FC<FigmaApplicationDetailProps> = ({
 
   const progressSteps = [
     { id: 'submitted', label: 'Submitted', status: 'completed' as const },
-    { id: 'in-review', label: 'In Review', status: 'current' as const },
-    { id: 'approved', label: 'Approved', status: 'pending' as const },
-    { id: 'funded', label: 'Funded', status: 'pending' as const },
+    { 
+      id: 'in-review', 
+      label: 'In Review', 
+      status: applicationStatus === 'submitted' ? 'pending' as const : 
+              applicationStatus === 'in-review' ? 'current' as const : 
+              applicationStatus === 'rejected' ? 'rejected' as const :
+              'completed' as const 
+    },
+    { 
+      id: 'approved', 
+      label: applicationStatus === 'rejected' ? 'Rejected' : 'Approved', 
+      status: applicationStatus === 'approved' ? 'current' as const : 
+              applicationStatus === 'funded' ? 'completed' as const : 
+              applicationStatus === 'rejected' ? 'rejected' as const :
+              'pending' as const 
+    },
+    { 
+      id: 'funded', 
+      label: 'Funded', 
+      status: applicationStatus === 'funded' ? 'current' as const : 'pending' as const 
+    },
   ];
 
   const applicationData = {
@@ -230,11 +322,13 @@ export const FigmaApplicationDetail: React.FC<FigmaApplicationDetailProps> = ({
   ];
 
   const handleApprove = () => {
-    console.log('Application approved');
+    setApplicationStatus('approved');
+    console.log('Application approved - status updated to approved');
   };
 
   const handleReject = () => {
-    console.log('Application rejected');
+    setApplicationStatus('rejected');
+    console.log('Application rejected - status updated to rejected');
   };
 
   const handleTabChange = (tabId: string) => {
@@ -321,6 +415,12 @@ export const FigmaApplicationDetail: React.FC<FigmaApplicationDetailProps> = ({
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
                     </div>
+                  ) : step.status === 'rejected' ? (
+                    <div className="aspect-[1] object-contain w-6 self-center bg-red-600 rounded-full flex items-center justify-center">
+                      <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                    </div>
                   ) : (
                     <div className={`justify-center items-center self-center flex w-6 flex-col overflow-hidden h-6 px-[5px] rounded-xl ${
                       step.status === 'current' 
@@ -333,14 +433,18 @@ export const FigmaApplicationDetail: React.FC<FigmaApplicationDetailProps> = ({
                     </div>
                   )}
                   <div className={`w-full mt-3 pt-0.5 ${
-                    step.status === 'current' ? 'text-green-600' : 'text-[#344054]'
+                    step.status === 'current' ? 'text-green-600' : 
+                    step.status === 'rejected' ? 'text-red-600' : 
+                    'text-[#344054]'
                   }`}>
                     <div>{step.label}</div>
                   </div>
                 </div>
                 {index < progressSteps.length - 1 && (
                   <div className={`flex mr-[-120px] w-64 shrink-0 max-w-full h-0.5 mt-[11px] ${
-                    step.status === 'completed' ? 'bg-green-600' : 'bg-[#EAECF0]'
+                    step.status === 'completed' ? 'bg-green-600' : 
+                    step.status === 'rejected' ? 'bg-red-600' : 
+                    'bg-[#EAECF0]'
                   }`} />
                 )}
               </div>
@@ -372,18 +476,32 @@ export const FigmaApplicationDetail: React.FC<FigmaApplicationDetailProps> = ({
                 <div className="self-stretch flex items-center gap-[9px] text-base whitespace-nowrap my-auto">
                   <button 
                     onClick={handleApprove}
-                    className="justify-center items-center border shadow-[0_1px_2px_0_rgba(16,24,40,0.05)] bg-[#1A2340] self-stretch flex gap-2 overflow-hidden text-[#FFF5E6] my-auto px-[18px] py-2.5 rounded-lg border-solid border-[#FFF5E6] hover:bg-[#2A3450] transition-colors"
+                    disabled={applicationStatus === 'approved' || applicationStatus === 'rejected'}
+                    className={`justify-center items-center border shadow-[0_1px_2px_0_rgba(16,24,40,0.05)] self-stretch flex gap-2 overflow-hidden my-auto px-[18px] py-2.5 rounded-lg border-solid transition-colors ${
+                      applicationStatus === 'approved'
+                        ? 'bg-green-600 text-white border-green-600 cursor-not-allowed'
+                        : applicationStatus === 'rejected'
+                        ? 'bg-gray-300 text-gray-500 border-gray-300 cursor-not-allowed'
+                        : 'bg-[#1A2340] text-[#FFF5E6] border-[#FFF5E6] hover:bg-[#2A3450] cursor-pointer'
+                    }`}
                   >
                     <div className="self-stretch my-auto">
-                      Approve
+                      {applicationStatus === 'approved' ? 'Approved ✓' : 'Approve'}
                     </div>
                   </button>
                   <button 
                     onClick={handleReject}
-                    className="justify-center items-center border shadow-[0_1px_2px_0_rgba(16,24,40,0.05)] self-stretch flex gap-2 overflow-hidden text-red-600 bg-red-100 my-auto px-[18px] py-2.5 rounded-lg border-solid border-[#F9F5FF] hover:bg-red-200 transition-colors"
+                    disabled={applicationStatus === 'approved' || applicationStatus === 'rejected'}
+                    className={`justify-center items-center border shadow-[0_1px_2px_0_rgba(16,24,40,0.05)] self-stretch flex gap-2 overflow-hidden my-auto px-[18px] py-2.5 rounded-lg border-solid transition-colors ${
+                      applicationStatus === 'rejected'
+                        ? 'bg-red-600 text-white border-red-600 cursor-not-allowed'
+                        : applicationStatus === 'approved'
+                        ? 'bg-gray-300 text-gray-500 border-gray-300 cursor-not-allowed'
+                        : 'bg-red-100 text-red-600 border-[#F9F5FF] hover:bg-red-200 cursor-pointer'
+                    }`}
                   >
-                    <div className="text-red-600 self-stretch my-auto">
-                      Reject
+                    <div className="self-stretch my-auto">
+                      {applicationStatus === 'rejected' ? 'Rejected ✗' : 'Reject'}
                     </div>
                   </button>
                 </div>
@@ -855,9 +973,35 @@ export const FigmaApplicationDetail: React.FC<FigmaApplicationDetailProps> = ({
             )}
             
             {activeTab === 'relationship' && (
-              <div className="w-full mt-4">
+              <div className="w-full mt-4 relative">
+                {/* Scroll Ball Navigation */}
+                <div className="fixed right-8 top-1/2 transform -translate-y-1/2 z-30">
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-10 shadow-[0px_4px_60px_0px_rgba(0,0,0,0.1)]">
+                    <div className="flex flex-col gap-6 items-center justify-center">
+                      {relationshipSections.map((section) => (
+                        <div
+                          key={section.id}
+                          onClick={() => scrollToSection(section.id)}
+                          className="flex gap-4 items-start justify-center w-full cursor-pointer hover:opacity-80 transition-opacity"
+                        >
+                          <div className="relative shrink-0 size-[24px]">
+                            {section.icon}
+                          </div>
+                          <div className={`basis-0 font-['Inter'] grow leading-none min-h-px min-w-px not-italic text-[20px] ${
+                            activeRelationshipSection === section.id 
+                              ? 'font-semibold text-gray-900 opacity-100' 
+                              : 'font-medium text-gray-900 opacity-30'
+                          }`}>
+                            <p className="leading-[24px]">{section.label}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
                 {/* Loan Purpose & Impact Summary */}
-                <div className="bg-slate-50 border border-slate-200 rounded-[20px] p-[30px] mb-6">
+                <div id="loan-purpose" className="bg-slate-50 border border-slate-200 rounded-[20px] p-[30px] mb-6">
                   <div className="flex items-start justify-between w-full">
                     <div className="flex flex-col gap-8 w-[615px]">
                       {/* Title */}
@@ -921,7 +1065,7 @@ export const FigmaApplicationDetail: React.FC<FigmaApplicationDetailProps> = ({
                 </div>
 
                 {/* Relationship History */}
-                <div className="bg-white border border-[#eaecf0] rounded-lg p-[30px] mb-6">
+                <div id="relationship-history" className="bg-white border border-[#eaecf0] rounded-lg p-[30px] mb-6">
                   {/* Title */}
                   <div className="flex gap-2 items-center mb-10">
                     <div className="w-6 h-6">
@@ -982,7 +1126,7 @@ export const FigmaApplicationDetail: React.FC<FigmaApplicationDetailProps> = ({
                 </div>
 
                 {/* Community Impact */}
-                <div className="bg-slate-50 border border-[#eaecf0] rounded-lg p-[30px]">
+                <div id="community-impact" className="bg-slate-50 border border-[#eaecf0] rounded-lg p-[30px]">
                   {/* Title */}
                   <div className="flex gap-2 items-center mb-10">
                     <div className="w-6 h-6">
@@ -1308,351 +1452,253 @@ export const FigmaApplicationDetail: React.FC<FigmaApplicationDetailProps> = ({
             )}
             
             {activeTab === 'documents' && (
-              <div className="w-full mt-4">
-                <h1 className="text-[24px] font-medium text-slate-950 mb-6 tracking-[-0.72px] leading-8">
-                  Business & Personal Financial Stability
-                </h1>
-
-                <div className="space-y-6">
-                  {/* Loan Purpose & Impact Summary */}
-                  <div className="bg-slate-50 border border-slate-200 rounded-[20px] p-[30px]">
-                    <div className="mb-6">
-                      <div className="flex gap-2 items-center mb-4">
-                        <div className="w-6 h-6">
-                          <svg className="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M10 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8l-2-2z"/>
-                          </svg>
-                        </div>
-                        <h2 className="text-[20px] font-medium text-gray-900">Loan Purpose & Impact Summary</h2>
-                      </div>
-                    </div>
-
-                    <div className="bg-white border border-[#eaecf0] rounded-lg p-8">
-                      <div className="space-y-6">
-                        <div>
-                          <div className="text-[#667085] text-[14px] font-medium mb-3">Personal-business fund mingling</div>
-                          <div className="text-yellow-600 text-[16px] font-medium leading-6">
-                            Occasional personal expenses detected in business account ($124.56 at Walmart).
+              <div className="flex flex-col gap-4 items-start justify-start w-full">
+                {/* Main Document Container - Exact Figma Implementation */}
+                <div className="bg-white border border-[#d0d5dd] rounded-2xl p-7 w-full">
+                  <div className="flex gap-6 items-start justify-start w-full">
+                    <div className="basis-0 flex flex-col gap-6 grow items-start justify-start min-h-px min-w-px self-stretch">
+                      <div className="bg-slate-50 border border-slate-200 rounded-[20px] p-[30px] w-full">
+                        <div className="flex flex-col gap-6 items-start justify-start w-full">
+                          <div className="flex flex-col gap-3 items-start justify-start max-w-[660px] w-full">
+                            <div className="flex gap-2 items-center justify-start w-full">
+                              <div className="relative shrink-0 size-[24px]">
+                                <svg className="block max-w-none size-full" fill="currentColor" viewBox="0 0 24 24">
+                                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" />
+                                  <polyline points="14,2 14,8 20,8" stroke="currentColor" strokeWidth="2" fill="none" />
+                                  <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" strokeWidth="2" />
+                                  <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" strokeWidth="2" />
+                                </svg>
+                              </div>
+                              <div className="flex gap-1 items-start justify-start">
+                                <div className="font-['Inter'] font-medium leading-none text-[20px] text-gray-900">
+                                  <p className="leading-[24px] whitespace-pre">Submitted Documents</p>
+                                </div>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-
-                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
-
-                        <div>
-                          <div className="text-[#667085] text-[14px] font-medium mb-3">Frequency and volume of mingling</div>
-                          <div className="text-green-600 text-[16px] font-medium leading-6">
-                            Low volume and infrequent, within expected seasonal patterns.
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Point-of-Sale (POS) Data Analysis */}
-                  <div className="bg-slate-50 border border-slate-200 rounded-[20px] p-[30px]">
-                    <div className="mb-6">
-                      <div className="flex gap-2 items-center mb-4">
-                        <div className="w-6 h-6">
-                          <svg className="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M7 13c0 2.21 1.79 4 4 4s4-1.79 4-4-1.79-4-4-4-4 1.79-4 4zm8.39 5.56c-.64-.22-1.27-.46-1.89-.72l.72-1.94c.5.2 1.02.36 1.54.48l-.37 2.18zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
-                          </svg>
-                        </div>
-                        <h2 className="text-[20px] font-medium text-gray-900">Point-of-Sale (POS) Data Analysis</h2>
-                      </div>
-                    </div>
-
-                    <div className="bg-white border border-[#eaecf0] rounded-lg p-8 flex-1">
-                      <div className="space-y-6">
-                        <div>
-                          <div className="text-[#667085] text-[14px] font-medium mb-3">Customer portfolio health & diversity</div>
-                          <div className="text-yellow-600 text-[16px] font-medium leading-6">
-                            80% repeat customers indicating strong customer loyalty. Revenue sources are well diversified.
-                          </div>
-                        </div>
-
-                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
-
-                        <div>
-                          <div className="text-[#667085] text-[14px] font-medium mb-3">Frequency and nature of disputes</div>
-                          <div className="text-green-600 text-[16px] font-medium leading-6">
-                            Dispute rate below 1%, with no recurring issues.
-                          </div>
-                        </div>
-
-                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
-
-                        <div>
-                          <div className="text-[#667085] text-[14px] font-medium mb-3">Transaction processing consistency</div>
-                          <div className="text-green-600 text-[16px] font-medium leading-6">
-                            Stable transaction volume averaging $50,000/month, no major disruptions.
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Personal Financial Stability & Behavioral Insights */}
-                  <div className="bg-slate-50 border border-slate-200 rounded-[20px] p-[30px]">
-                    <div className="mb-6">
-                      <div className="flex gap-2 items-center mb-4">
-                        <div className="w-6 h-6">
-                          <svg className="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
-                          </svg>
-                        </div>
-                        <h2 className="text-[20px] font-medium text-gray-900">Personal Financial Stability & Behavioral Insights</h2>
-                      </div>
-                    </div>
-
-                    <div className="bg-white border border-[#eaecf0] rounded-lg p-8">
-                      <div className="space-y-6">
-                        <div>
-                          <div className="text-[#667085] text-[14px] font-medium mb-3">Debt levels and repayment behavior</div>
-                          <div className="text-yellow-600 text-[16px] font-medium leading-6">
-                            Low personal debt ($5,000) with consistent on-time repayments over 24 months.
-                          </div>
-                        </div>
-
-                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
-
-                        <div>
-                          <div className="text-[#667085] text-[14px] font-medium mb-3">Credit utilization and history</div>
-                          <div className="text-green-600 text-[16px] font-medium leading-6">
-                            Credit utilization under 25%, no late payments, stable credit score over the past 6 months.
-                          </div>
-                        </div>
-
-                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
-
-                        <div>
-                          <div className="text-[#667085] text-[14px] font-medium mb-3">Verification of income sources</div>
-                          <div className="text-green-600 text-[16px] font-medium leading-6">
-                            Verified annual income of $100,000 through tax returns and bank deposits.
-                          </div>
-                        </div>
-
-                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
-
-                        <div>
-                          <div className="text-[#667085] text-[14px] font-medium mb-3">Experience in business/industry</div>
-                          <div className="text-green-600 text-[16px] font-medium leading-6">
-                            12 years total industry experience, 8 years operating current business.
-                          </div>
-                        </div>
-
-                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
-
-                        <div>
-                          <div className="text-[#667085] text-[14px] font-medium mb-3">Open Bankruptcies, Judgements, Liens & More</div>
-                          <div className="text-green-600 text-[16px] font-medium leading-6">
-                            No
-                          </div>
-                        </div>
-
-                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
-
-                        <div>
-                          <div className="text-[#667085] text-[14px] font-medium mb-3">Overdraft & NSF frequency</div>
-                          <div className="text-green-600 text-[16px] font-medium leading-6">
-                            No overdrafts reported in the past 18 months. 2 NSFs reported over the past 6 months.
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Business Financial Stability & Behavioral Insights */}
-                  <div className="bg-slate-50 border border-slate-200 rounded-[20px] p-[30px]">
-                    <div className="mb-6">
-                      <div className="flex gap-2 items-center mb-4">
-                        <div className="w-6 h-6">
-                          <svg className="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
-                          </svg>
-                        </div>
-                        <h2 className="text-[20px] font-medium text-gray-900">Business Financial Stability & Behavioral Insights</h2>
-                      </div>
-                    </div>
-
-                    <div className="bg-white border border-[#eaecf0] rounded-lg p-5 flex justify-between">
-                      {/* Left Column */}
-                      <div className="w-[548px] space-y-6">
-                        <div>
-                          <div className="text-[#667085] text-[14px] font-medium mb-3">Deposit frequency and regularity</div>
-                          <div className="text-green-600 text-[16px] font-medium leading-6">
-                            Average 15 deposits per month, no gaps longer than 10 days between deposits.
-                          </div>
-                        </div>
-
-                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
-
-                        <div>
-                          <div className="text-[#667085] text-[14px] font-medium mb-3">Gross Margin &gt;= 35%</div>
-                          <div className="text-green-600 text-[16px] font-medium leading-6">
-                            42%, no negative cashflow months in the past year.
-                          </div>
-                        </div>
-
-                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
-
-                        <div>
-                          <div className="text-[#667085] text-[14px] font-medium mb-3">Net Income Margin &gt;5%</div>
-                          <div className="text-green-600 text-[16px] font-medium leading-6">
-                            7%.
-                          </div>
-                        </div>
-
-                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
-
-                        <div>
-                          <div className="text-[#667085] text-[14px] font-medium mb-3">Payment history</div>
-                          <div className="text-green-600 text-[16px] font-medium leading-6">
-                            Clean record with 95% on-time payments over the last 24 months.
-                          </div>
-                        </div>
-
-                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
-
-                        <div>
-                          <div className="text-[#667085] text-[14px] font-medium mb-3">Overdraft frequency</div>
-                          <div className="text-green-600 text-[16px] font-medium leading-6">
-                            No overdrafts reported in the past 18 months.
-                          </div>
-                        </div>
-
-                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
-
-                        <div>
-                          <div className="text-[#667085] text-[14px] font-medium mb-3">Recovery signals</div>
-                          <div className="text-green-600 text-[16px] font-medium leading-6">
-                            Prompt recovery from minor past delinquencies, showing financial discipline.
-                          </div>
-                        </div>
-
-                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
-
-                        <div>
-                          <div className="text-[#667085] text-[14px] font-medium mb-3">Open Judgement, Liens & More</div>
-                          <div className="text-green-600 text-[16px] font-medium leading-6">
-                            No
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Right Column - Financial Metrics */}
-                      <div className="bg-[#fcfcfd] border border-[#eaecf0] rounded-lg px-[50px] py-5 w-[303px] flex flex-col justify-center">
-                        <div className="space-y-6">
-                          <div className="max-w-[203px]">
-                            <div className="text-[#667085] text-[14px] font-medium mb-3">Debt-to-Income (DTI)</div>
-                            <div className="text-black text-[16px] font-medium leading-6">28%</div>
-                          </div>
-
-                          <div className="h-[1px] bg-[#eaecf0] w-full"></div>
-
-                          <div className="max-w-[203px]">
-                            <div className="text-[#667085] text-[14px] font-medium mb-3">Debt Service Coverage Ratio</div>
-                            <div className="text-black text-[16px] font-medium leading-6">1.8x</div>
-                          </div>
-
-                          <div className="h-[1px] bg-[#eaecf0] w-full"></div>
-
-                          <div className="max-w-[203px]">
-                            <div className="text-[#667085] text-[14px] font-medium mb-3">Current Ratio</div>
-                            <div className="text-black text-[16px] font-medium leading-6">2.1</div>
-                          </div>
-
-                          <div className="h-[1px] bg-[#eaecf0] w-full"></div>
-
-                          <div className="max-w-[203px]">
-                            <div className="text-[#667085] text-[14px] font-medium mb-3">Global Debt Service</div>
-                            <div className="text-black text-[16px] font-medium leading-6">35%</div>
-                          </div>
-
-                          <div className="h-[1px] bg-[#eaecf0] w-full"></div>
-
-                          <div className="max-w-[203px]">
-                            <div className="text-[#667085] text-[14px] font-medium mb-3">Return on Equity (ROE)</div>
-                            <div className="text-black text-[16px] font-medium leading-6">15%</div>
-                          </div>
-
-                          <div className="h-[1px] bg-[#eaecf0] w-full"></div>
-
-                          <div className="max-w-[203px]">
-                            <div className="text-[#667085] text-[14px] font-medium mb-3">Return on Assets</div>
-                            <div className="text-black text-[16px] font-medium leading-6">12%</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Tax Return Verification */}
-                  <div className="bg-slate-50 border border-slate-200 rounded-[20px] p-[30px]">
-                    <div className="mb-6">
-                      <div className="flex gap-2 items-center mb-4">
-                        <div className="w-6 h-6">
-                          <svg className="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
-                            <polyline points="14,2 14,8 20,8"/>
-                            <line x1="16" y1="13" x2="8" y2="13"/>
-                            <line x1="16" y1="17" x2="8" y2="17"/>
-                          </svg>
-                        </div>
-                        <h2 className="text-[20px] font-medium text-gray-900">Tax Return Verification</h2>
-                      </div>
-                    </div>
-
-                    <div className="bg-white border border-[#eaecf0] rounded-lg p-5">
-                      <div className="space-y-6">
-                        <div>
-                          <div className="text-[#667085] text-[14px] font-medium mb-3">Filing history</div>
-                          <div className="text-yellow-600 text-[16px] font-medium leading-6">
-                            All required tax returns for 2021-2023 filed on time.
-                          </div>
-                        </div>
-
-                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
-
-                        <div>
-                          <div className="text-[#667085] text-[14px] font-medium mb-3">Revenue match</div>
-                          <div className="text-green-600 text-[16px] font-medium leading-6">
-                            Application states $600,000; tax return shows $570,000. 5.3% variance, good.
-                          </div>
-                        </div>
-
-                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
-
-                        <div>
-                          <div className="text-[#667085] text-[14px] font-medium mb-3">Profitability</div>
-                          <div className="text-green-600 text-[16px] font-medium leading-6">
-                            Positive net profit in all years, average margin 14%.
-                          </div>
-                        </div>
-
-                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
-
-                        <div>
-                          <div className="text-[#667085] text-[14px] font-medium mb-3">Business structure match</div>
-                          <div className="text-green-600 text-[16px] font-medium leading-6">
-                            Business structure reported as S-Corp; matches application details.
-                          </div>
-                        </div>
-
-                        <div className="h-[1px] bg-[#eaecf0] w-full"></div>
-
-                        <div>
-                          <div className="text-[#667085] text-[14px] font-medium mb-3">Risk flags</div>
-                          <div className="text-green-600 text-[16px] font-medium leading-6">
-                            No significant revenue decline, volatility, or loss carryforwards detected.
+                          <div className="flex flex-col gap-3 items-start justify-start w-full">
+                            {/* Income Statement */}
+                            <div className="bg-white border border-slate-100 rounded-[10px] w-full">
+                              <div className="flex gap-[10px] items-start justify-start overflow-clip p-5 w-full">
+                                <div className="basis-0 flex flex-col gap-3 grow items-start justify-start min-h-px min-w-px">
+                                  <div className="flex items-center justify-between w-full">
+                                    <div className="flex gap-1 items-start justify-start">
+                                      <div className="font-['Inter'] font-medium leading-none text-[16px] text-slate-950">
+                                        <p className="leading-[24px] whitespace-pre">Income Statement</p>
+                                      </div>
+                                    </div>
+                                    <div className="flex gap-3 items-center justify-start">
+                                      <div className="flex items-start justify-start mix-blend-multiply">
+                                        <div className="bg-[#ecfdf3] flex items-center justify-center px-2 py-0.5 rounded-2xl">
+                                          <div className="font-['Inter'] font-medium leading-none text-[#027a48] text-[12px] text-center">
+                                            <p className="leading-[18px] whitespace-pre">90% Confident</p>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="overflow-clip relative size-4">
+                                        <div className="absolute inset-[12.5%]">
+                                          <div className="absolute inset-[-6.25%]">
+                                            <svg className="block max-w-none size-full" fill="none" stroke="#101828" strokeWidth="2" viewBox="0 0 24 24">
+                                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                              <polyline points="7,10 12,15 17,10" />
+                                              <line x1="12" y1="15" x2="12" y2="3" />
+                                            </svg>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            {/* Cash Flow Statement */}
+                            <div className="bg-white border border-slate-100 rounded-[10px] w-full">
+                              <div className="flex gap-[10px] items-start justify-start overflow-clip p-5 w-full">
+                                <div className="basis-0 flex flex-col gap-3 grow items-start justify-start min-h-px min-w-px">
+                                  <div className="flex items-center justify-between w-full">
+                                    <div className="flex gap-1 items-start justify-start">
+                                      <div className="font-['Inter'] font-medium leading-none text-[16px] text-slate-950">
+                                        <p className="leading-[24px] whitespace-pre">Cash Flow Statement</p>
+                                      </div>
+                                    </div>
+                                    <div className="flex gap-3 items-center justify-start">
+                                      <div className="flex items-start justify-start mix-blend-multiply">
+                                        <div className="bg-[#ecfdf3] flex items-center justify-center px-2 py-0.5 rounded-2xl">
+                                          <div className="font-['Inter'] font-medium leading-none text-[#027a48] text-[12px] text-center">
+                                            <p className="leading-[18px] whitespace-pre">90% Confident</p>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="overflow-clip relative size-4">
+                                        <div className="absolute inset-[12.5%]">
+                                          <div className="absolute inset-[-6.25%]">
+                                            <svg className="block max-w-none size-full" fill="none" stroke="#101828" strokeWidth="2" viewBox="0 0 24 24">
+                                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                              <polyline points="7,10 12,15 17,10" />
+                                              <line x1="12" y1="15" x2="12" y2="3" />
+                                            </svg>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            {/* Personal Bank Statements */}
+                            <div className="bg-white border border-slate-100 rounded-[10px] w-full">
+                              <div className="flex gap-[10px] items-start justify-start overflow-clip p-5 w-full">
+                                <div className="basis-0 flex flex-col gap-3 grow items-start justify-start min-h-px min-w-px">
+                                  <div className="flex items-center justify-between w-full">
+                                    <div className="flex gap-1 items-start justify-start">
+                                      <div className="font-['Inter'] font-medium leading-none text-[16px] text-slate-950">
+                                        <p className="leading-[24px] whitespace-pre">Personal Bank Statements</p>
+                                      </div>
+                                    </div>
+                                    <div className="flex gap-3 items-center justify-start">
+                                      <div className="flex items-start justify-start mix-blend-multiply">
+                                        <div className="bg-[#fffaeb] flex items-center justify-center px-2 py-0.5 rounded-2xl">
+                                          <div className="font-['Inter'] font-medium leading-none text-[#b54708] text-[12px] text-center">
+                                            <p className="leading-[18px] whitespace-pre">78% confident</p>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="overflow-clip relative size-4">
+                                        <div className="absolute inset-[12.5%]">
+                                          <div className="absolute inset-[-6.25%]">
+                                            <svg className="block max-w-none size-full" fill="none" stroke="#101828" strokeWidth="2" viewBox="0 0 24 24">
+                                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                              <polyline points="7,10 12,15 17,10" />
+                                              <line x1="12" y1="15" x2="12" y2="3" />
+                                            </svg>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            {/* Tax Returns (3 years) */}
+                            <div className="bg-white border border-slate-100 rounded-[10px] w-full">
+                              <div className="flex gap-[10px] items-start justify-start overflow-clip p-5 w-full">
+                                <div className="basis-0 flex flex-col gap-3 grow items-start justify-start min-h-px min-w-px">
+                                  <div className="flex items-center justify-between w-full">
+                                    <div className="flex gap-1 items-start justify-start">
+                                      <div className="font-['Inter'] font-medium leading-none text-[16px] text-slate-950">
+                                        <p className="leading-[24px] whitespace-pre">Tax Returns (3 years)</p>
+                                      </div>
+                                    </div>
+                                    <div className="flex gap-3 items-center justify-start">
+                                      <div className="flex items-start justify-start mix-blend-multiply">
+                                        <div className="bg-[#fef3f2] flex items-center justify-center px-2 py-0.5 rounded-2xl">
+                                          <div className="font-['Inter'] font-medium leading-none text-[#b42318] text-[12px] text-center">
+                                            <p className="leading-[18px] whitespace-pre">44% confident</p>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="overflow-clip relative size-4">
+                                        <div className="absolute inset-[12.5%]">
+                                          <div className="absolute inset-[-6.25%]">
+                                            <svg className="block max-w-none size-full" fill="none" stroke="#101828" strokeWidth="2" viewBox="0 0 24 24">
+                                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                              <polyline points="7,10 12,15 17,10" />
+                                              <line x1="12" y1="15" x2="12" y2="3" />
+                                            </svg>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-
-                {/* Bottom separator line */}
-                <div className="h-[1px] bg-[#eaecf0] w-full mt-8"></div>
+                
+                {/* Credit Memo and Financial Spreads Cards */}
+                <div className="flex gap-9 items-center justify-start w-full mt-6">
+                  {/* Credit Memo Card */}
+                  <div className="basis-0 bg-white grow min-h-px min-w-px relative rounded-[12px] border border-slate-200 overflow-hidden">
+                    <div className="flex items-start justify-between p-8 relative w-full min-h-[160px]">
+                      <div className="flex flex-col gap-0.5 items-start justify-start relative w-[347px] z-10">
+                        <div className="font-['Inter'] font-medium leading-none text-[16px] text-slate-950 w-full">
+                          <p className="leading-[24px]">Credit Memo</p>
+                        </div>
+                      </div>
+                      {/* Bank Cheque Illustration */}
+                      <div className="absolute right-[-50px] top-[-20px] w-[276px] h-[276px] opacity-20">
+                        <svg className="block max-w-none size-full" viewBox="0 0 276 276" fill="none">
+                          <rect x="20" y="60" width="220" height="140" fill="#F1F5F9" rx="8" stroke="#CBD5E1" strokeWidth="2"/>
+                          <rect x="30" y="80" width="180" height="6" fill="#CBD5E1" rx="3"/>
+                          <rect x="30" y="95" width="140" height="6" fill="#CBD5E1" rx="3"/>
+                          <rect x="30" y="110" width="100" height="6" fill="#CBD5E1" rx="3"/>
+                          <rect x="30" y="140" width="60" height="12" fill="#10B981" rx="6"/>
+                          <rect x="140" y="140" width="50" height="12" fill="#E2E8F0" rx="6"/>
+                          <circle cx="200" cy="90" r="25" fill="#E2E8F0" stroke="#CBD5E1" strokeWidth="2"/>
+                          <text x="200" y="95" textAnchor="middle" className="text-xs fill-slate-500 font-medium">$</text>
+                        </svg>
+                      </div>
+                      <div className="bg-white relative rounded-[8px] border border-[#eaecf0] shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] z-10">
+                        <div className="flex gap-2 items-center justify-center overflow-clip px-4 py-2.5 relative">
+                          <div className="font-['Inter'] font-medium leading-none text-[#d0d5dd] text-[14px]">
+                            <p className="leading-[20px] whitespace-pre">Coming Soon</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Financial Spreads Card */}
+                  <div className="basis-0 bg-white grow min-h-px min-w-px relative rounded-[12px] border border-slate-200 overflow-hidden">
+                    <div className="flex items-center justify-between p-8 relative w-full min-h-[160px]">
+                      <div className="flex flex-col gap-0.5 items-start justify-start relative w-[353px] z-10">
+                        <div className="font-['Inter'] font-medium leading-none text-[16px] text-slate-950 w-full">
+                          <p className="leading-[24px]">Financial Spreads</p>
+                        </div>
+                      </div>
+                      <div className="bg-white relative rounded-[8px] border border-[#eaecf0] shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] z-10">
+                        <div className="flex gap-2 items-center justify-center overflow-clip px-4 py-2.5 relative">
+                          <div className="font-['Inter'] font-medium leading-none text-[#d0d5dd] text-[14px]">
+                            <p className="leading-[20px] whitespace-pre">Coming Soon</p>
+                          </div>
+                        </div>
+                      </div>
+                      {/* Financial Spreadsheet Illustration */}
+                      <div className="absolute right-[-30px] bottom-[-20px] w-[132px] h-[132px] opacity-25">
+                        <svg className="block max-w-none size-full" viewBox="0 0 132 132" fill="none">
+                          <rect x="10" y="20" width="112" height="92" fill="#F8FAFC" rx="4" stroke="#E2E8F0" strokeWidth="1"/>
+                          {/* Spreadsheet grid */}
+                          <line x1="10" y1="35" x2="122" y2="35" stroke="#E2E8F0" strokeWidth="1"/>
+                          <line x1="10" y1="50" x2="122" y2="50" stroke="#E2E8F0" strokeWidth="1"/>
+                          <line x1="10" y1="65" x2="122" y2="65" stroke="#E2E8F0" strokeWidth="1"/>
+                          <line x1="10" y1="80" x2="122" y2="80" stroke="#E2E8F0" strokeWidth="1"/>
+                          <line x1="10" y1="95" x2="122" y2="95" stroke="#E2E8F0" strokeWidth="1"/>
+                          <line x1="35" y1="20" x2="35" y2="112" stroke="#E2E8F0" strokeWidth="1"/>
+                          <line x1="60" y1="20" x2="60" y2="112" stroke="#E2E8F0" strokeWidth="1"/>
+                          <line x1="85" y1="20" x2="85" y2="112" stroke="#E2E8F0" strokeWidth="1"/>
+                          <line x1="110" y1="20" x2="110" y2="112" stroke="#E2E8F0" strokeWidth="1"/>
+                          {/* Data cells */}
+                          <rect x="15" y="25" width="15" height="8" fill="#10B981" opacity="0.7" rx="1"/>
+                          <rect x="40" y="25" width="15" height="8" fill="#3B82F6" opacity="0.7" rx="1"/>
+                          <rect x="65" y="25" width="15" height="8" fill="#F59E0B" opacity="0.7" rx="1"/>
+                          <rect x="90" y="25" width="15" height="8" fill="#EF4444" opacity="0.7" rx="1"/>
+                          <rect x="15" y="40" width="15" height="8" fill="#CBD5E1" opacity="0.7" rx="1"/>
+                          <rect x="40" y="40" width="15" height="8" fill="#CBD5E1" opacity="0.7" rx="1"/>
+                          <rect x="65" y="40" width="15" height="8" fill="#CBD5E1" opacity="0.7" rx="1"/>
+                          <rect x="90" y="40" width="15" height="8" fill="#CBD5E1" opacity="0.7" rx="1"/>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </div>
